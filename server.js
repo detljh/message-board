@@ -1,9 +1,12 @@
 'use strict';
 
+require('dotenv').config();
 var express     = require('express');
 var bodyParser  = require('body-parser');
 var expect      = require('chai').expect;
 var cors        = require('cors');
+const helmet = require('helmet');
+const db = require('./db.js');
 
 var apiRoutes         = require('./routes/api.js');
 var fccTestingRoutes  = require('./routes/fcctesting.js');
@@ -17,6 +20,7 @@ app.use(cors({origin: '*'})); //For FCC testing purposes only
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(helmet());
 
 //Sample front-end
 app.route('/b/:board/')
@@ -37,8 +41,8 @@ app.route('/')
 //For FCC testing purposes
 fccTestingRoutes(app);
 
-//Routing for API 
-apiRoutes(app);
+//Routing for API
+apiRoutes(app, db);
 
 //Sample Front-end
 
