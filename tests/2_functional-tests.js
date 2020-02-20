@@ -11,28 +11,32 @@ var chai = require('chai');
 var assert = chai.assert;
 var server = require('../server');
 var Browser = require('zombie');
-Browser.site = Browser.localhost('example.com', 5000);
+var db = require('../db');
 
 chai.use(chaiHttp);
 
-suite('Functional Tests', function() {
-  const browser = new Browser();
-  suiteSetup((done) => {
-    return browser.visit('/', done);
-  })
+const browser = new Browser();
 
-  suite('API ROUTING FOR /api/threads/:board', function() {
+suite('Functional Tests', function() {
+  suiteSetup(() => {
+    return Promise.all([db.Board.deleteMany({}), db.Reply.deleteMany({}), db.Thread.deleteMany({})]);
+  });
+
+  suite('1. API ROUTING FOR /api/threads/:board', function() {
     
-    suite('POST', function() {
-      chai.request(server)
-        .fill('board', 'test')
-        .fill('text', 'text test')
-        .fill('delete_password', 'password')
-        .pressButton('submit', () => {
-          browser.assert.success();
-          done();
+    suite('1.1 POST', function() {
+      test('1.1.1 New thread', (done) => {
+        browser.visit("http://localhost:3000/").then(() => {
+          browser.fill('#board1', 'test');
+          browser.fill('text', 'text test');
+          browser.fill('delete_password', 'password');
+          browser.pressButton('New thread', () => {
+            browser.assert.success();
+            done();
+          });
         });
-    });
+      });
+    });    
     
     suite('GET', function() {
       

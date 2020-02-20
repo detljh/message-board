@@ -31,9 +31,6 @@ module.exports = function (app, db) {
             console.log(board);
           })
         }
-
-        console.log("a");
-        
       });
 
       res.redirect(`/b/${board}`);
