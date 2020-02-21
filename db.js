@@ -1,12 +1,17 @@
 const mongoose = require('mongoose');
 
-mongoose.connect(process.env.DATABASE, {useNewUrlParser: true, useUnifiedTopology: true});
 const Schema = mongoose.Schema;
-const boardSchema = new Schema({
-    name: String,
-    threads: {
-        type: Array,
-        default: []
+const replySchema = new Schema({
+    thread_id: Schema.Types.ObjectId,
+    text: String,
+    delete_password: String,
+    created_on: {
+        type: Date,
+        default: new Date()
+    },
+    reported: {
+        type: Boolean,
+        default: false
     }
 });
 const threadSchema = new Schema({
@@ -26,21 +31,15 @@ const threadSchema = new Schema({
     },
     delete_password: String,
     replies: {
-        type: Array,
+        type: [replySchema],
         default: []
     }
 });
-const replySchema = new Schema({
-    thread_id: Schema.Types.ObjectId,
-    text: String,
-    delete_password: String,
-    created_on: {
-        type: Date,
-        default: new Date()
-    },
-    reported: {
-        type: Boolean,
-        default: false
+const boardSchema = new Schema({
+    name: String,
+    threads: {
+        type: [threadSchema],
+        default: []
     }
 });
 

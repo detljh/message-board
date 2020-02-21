@@ -3,9 +3,8 @@
 	"version": "0.0.1",
 	"main": "server.js",
 	"scripts": {
-		"start": "node server.js",
-		"watch": "nodemon server.js",
-		"test": "mocha -u tdd tests"
+		"start": "NODE_ENV=development nodemon server.js",
+		"test": "NODE_ENV=test mocha -u tdd tests/*"
 	},
 	"dependencies": {
 		"body-parser": "^1.15.2",

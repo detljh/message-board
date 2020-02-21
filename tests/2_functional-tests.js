@@ -23,23 +23,33 @@ suite('Functional Tests', function() {
   });
 
   suite('1. API ROUTING FOR /api/threads/:board', function() {
-    
     suite('1.1 POST', function() {
-      test('1.1.1 New thread', (done) => {
-        browser.visit("http://localhost:3000/").then(() => {
+      test('1.1.1 New thread created', (done) => {
+        browser.visit("http://localhost:8888/").then(() => {
           browser.fill('#board1', 'test');
           browser.fill('text', 'text test');
           browser.fill('delete_password', 'password');
           browser.pressButton('New thread', () => {
             browser.assert.success();
+            browser.assert.redirected();
+            browser.assert.text('#boardTitle', 'Welcome to /b/test');
+            browser.assert.url({pathname: '/b/test'});
+            browser.assert.element('#submitNewThread');
+            browser.assert.element('.thread');
+            browser.assert.text('.thread .main h3', 'text test');
             done();
           });
         });
       });
     });    
     
-    suite('GET', function() {
-      
+    suite('1.2 GET', function() {
+      test('1.2.1 Created thread is loaded', (done) => {
+        browser.visit("http://localhost:8888/api/threads/test").then(() => {
+          browser.assert.success();
+          done();
+        });
+      });
     });
     
     suite('DELETE', function() {

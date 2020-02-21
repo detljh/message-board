@@ -21,23 +21,40 @@ module.exports = function (app, db) {
         if (err) console.log(err);
 
         if (!doc) {
-          let newBoard = db.Board({
+          doc = db.Board({
             name: board
           });
-
-          newBoard.save((err, board) => {
-            if (err) console.log(err);
-
-            console.log(board);
-          })
         }
-      });
 
-      res.redirect(`/b/${board}`);
+        let newThread = db.Thread({
+          board_id: doc._id,
+          text: text,
+          delete_password: password
+        });
+
+        newThread.save((err, thread) => {
+          if (err) console.log(err);
+          doc.threads.push({
+            $each: [thread],
+            $position: 0
+          });
+          
+          doc.save((err, board) => {
+            if (err) console.log(err);
+          });
+        });
+        res.redirect(`/b/${board}`);
+      });
     })
     .get((req, res) => {
-      //console.log(req);
-      res.redirect(`/b/${req.param.board}`);
+      let threads = [];
+      db.Board.findOne({name: req.params.board}, (err, board) => {
+        if (err) console.log(err);
+        if (board) {
+          threads = board.threads;
+        }
+        res.send(threads);
+      });
     });
     
   app.route('/api/replies/:board');

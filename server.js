@@ -1,12 +1,15 @@
 'use strict';
 
 require('dotenv').config();
+const mongoose = require('mongoose');
 var express     = require('express');
 var bodyParser  = require('body-parser');
 var expect      = require('chai').expect;
 var cors        = require('cors');
 const helmet = require('helmet');
 const db = require('./db.js');
+const env = process.env.NODE_ENV || 'development';
+const config = require('./config.js')[env];
 
 var apiRoutes         = require('./routes/api.js');
 var fccTestingRoutes  = require('./routes/fcctesting.js');
@@ -41,6 +44,9 @@ app.route('/')
 //For FCC testing purposes
 fccTestingRoutes(app);
 
+//Database connection
+mongoose.connect(config.db, {useNewUrlParser: true, useUnifiedTopology: true});
+
 //Routing for API
 apiRoutes(app, db);
 
@@ -55,8 +61,8 @@ app.use(function(req, res, next) {
 });
 
 //Start our server and tests!
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Listening on port " + process.env.PORT);
+app.listen(process.env.PORT || config.port || 3000, function () {
+  console.log("Listening on port " + (process.env.PORT || config.port || 3000));
   if(process.env.NODE_ENV==='test') {
     console.log('Running Tests...');
     setTimeout(function () {
