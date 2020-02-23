@@ -5,10 +5,7 @@ const replySchema = new Schema({
     thread_id: Schema.Types.ObjectId,
     text: String,
     delete_password: String,
-    created_on: {
-        type: Date,
-        default: new Date()
-    },
+    created_on: Date,
     reported: {
         type: Boolean,
         default: false
@@ -17,14 +14,8 @@ const replySchema = new Schema({
 const threadSchema = new Schema({
     board_id: Schema.Types.ObjectId,
     text: String,
-    created_on: {
-        type: Date,
-        default: new Date()
-    },
-    bumped_on: {
-        type: Date,
-        default: new Date()
-    },
+    created_on: Date,
+    bumped_on: Date,
     reported: {
         type: Boolean,
         default: false
