@@ -30,17 +30,11 @@ const threadSchema = new Schema({
         default: false
     },
     delete_password: String,
-    replies: {
-        type: [replySchema],
-        default: []
-    }
+    replies: Array
 });
 const boardSchema = new Schema({
     name: String,
-    threads: {
-        type: [threadSchema],
-        default: []
-    }
+    threads: Array
 });
 
 const Board = mongoose.model('board', boardSchema);

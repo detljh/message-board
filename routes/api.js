@@ -51,12 +51,21 @@ module.exports = function (app, db) {
       db.Board.findOne({name: req.params.board}, (err, board) => {
         if (err) console.log(err);
         if (board) {
-          threads = board.threads;
+          let id = board._id;
+          db.Thread.find({board_id: id}).select('_id text created_on bumped_on replies').sort({bumped_on: -1}).limit(10).lean().exec((err, threads) => {
+            if (err) console.log(err);
+            threads.forEach(thread => {
+              thread['replycount'] = thread.replies.length;
+            });
+            res.json(threads);
+          });
         }
-        res.send(threads);
       });
     });
     
-  app.route('/api/replies/:board');
+  app.route('/api/replies/:board')
+    .post((req, res) => {
+      
+    });
 
 };

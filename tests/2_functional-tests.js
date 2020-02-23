@@ -47,6 +47,7 @@ suite('Functional Tests', function() {
       test('1.2.1 Created thread is loaded', (done) => {
         browser.visit("http://localhost:8888/api/threads/test").then(() => {
           browser.assert.success();
+          console.log(browser);
           done();
         });
       });
