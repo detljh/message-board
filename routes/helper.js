@@ -5,11 +5,11 @@ var db = require('../db.js');
 * @param board Name of board
 * @param text Thread text
 * @param password Password used to delete thread
-* @return Created thread on success
+* @return Created thread on success otherwise error message
 */
 const createThread = (board, text, password) => {
     db.Board.findOne({name: board}, (err, doc) => {
-        if (err) return res.send('Something went wrong. Please try again.');
+        if (err) return 'Something went wrong. Please try again.';
 
         if (!doc) {
             doc = db.Board({
@@ -27,10 +27,10 @@ const createThread = (board, text, password) => {
         });
 
         newThread.save((err, thread) => {
-        if (err) return res.send('Thread could not be created.');
+        if (err) return 'Thread could not be created.';
         
         doc.save((err, board) => {
-            if (err) return res.send('Board could not be updated.');
+            if (err) 'Board could not be updated.';
         });
         return thread;
         });
@@ -43,15 +43,15 @@ const createThread = (board, text, password) => {
 * @param thread_id ID of thread to reply to
 * @param text Reply text
 * @param password Password used to delete reply
-* @return Created Reply on success
+* @return Created reply on success otherwise error message
 */
 const createReply = (board, thread_id, text, password) => {
     db.Board.findOne({name: board}, (err, board) => {
-        if (err || !board) return res.send('Board does not exist');
+        if (err || !board) return 'Board does not exist';
 
         db.Thread.findOne({_id: thread_id}, (err, thread) => {
-            if (err || !thread) return res.send('Thread does not exist');
-            if (thread.board_id.toString() != board._id.toString()) return res.send('Thread does not exist in this board');
+            if (err || !thread) return 'Thread does not exist';
+            if (thread.board_id.toString() != board._id.toString()) return 'Thread does not exist in this board';
 
             let date = new Date();
             let newReply = db.Reply({
@@ -62,12 +62,12 @@ const createReply = (board, thread_id, text, password) => {
             });
 
             newReply.save((err, reply) => {
-                if (err) return res.send('Reply could not be saved');
+                if (err) return 'Reply could not be saved';
                 
                 thread.bumped_on = date;
                 thread.replies.push(reply);
                 thread.save((err, thread) => {
-                    if (err) return res.send('Something went wrong. Please try again.');
+                    if (err) return 'Something went wrong. Please try again.';
                     return reply;
                 });
             })

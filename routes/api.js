@@ -17,7 +17,10 @@ module.exports = function (app, db) {
       const board = req.body.board;
       const text = req.body.text;
       const password = req.body.delete_password;
-      helper.createThread(board, text, password);
+      
+      let result = helper.createThread(board, text, password);
+      if (typeof result == "string") return res.send(result);
+
       res.redirect(`/b/${board}`);
     })
     .get((req, res) => {
@@ -49,7 +52,10 @@ module.exports = function (app, db) {
       const thread_id = req.body.thread_id;
       const text = req.body.text;
       const password = req.body.delete_password;
-      helper.createReply(board, thread_id, text, password);
+
+      let result = helper.createReply(board, thread_id, text, password);
+      if (typeof result == "string") return res.send(result);
+
       res.redirect(`/b/${board}/${thread_id}`);
     })
     .get((req, res) => {
