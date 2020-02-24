@@ -24,8 +24,7 @@ const threadSchema = new Schema({
     replies: Array
 });
 const boardSchema = new Schema({
-    name: String,
-    threads: Array
+    name: String
 });
 
 const Board = mongoose.model('board', boardSchema);
