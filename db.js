@@ -21,7 +21,6 @@ const threadSchema = new Schema({
         default: false
     },
     delete_password: String,
-    replies: Array
 });
 const boardSchema = new Schema({
     name: String

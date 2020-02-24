@@ -65,7 +65,6 @@ const createReply = (board, thread_id, text, password) => {
                 if (err) return 'Reply could not be saved';
                 
                 thread.bumped_on = date;
-                thread.replies.push(reply);
                 thread.save((err, thread) => {
                     if (err) return 'Something went wrong. Please try again.';
                     return reply;
