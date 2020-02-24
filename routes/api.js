@@ -18,25 +18,24 @@ module.exports = function (app, db) {
       const text = req.body.text;
       const password = req.body.delete_password;
 
-      let result = helper.createThread(board, text, password);
-      if (typeof result == "string") return res.send(result);
-
-      res.redirect(`/b/${board}`);
+      helper.createThread(board, text, password).then(() => {
+        res.redirect(`/b/${board}`);
+      }).catch(err => res.status(500).send(err));
     })
     .get((req, res) => {
       db.Board.findOne({name: req.params.board}, (err, board) => {
-        if (err || !board) return res.send('Board does not exist.');
+        if (err || !board) return res.status(400).send('Board does not exist.');
 
         if (board) {
           let id = board._id;
 
           db.Thread.find({board_id: id}).select('_id text created_on bumped_on').sort({bumped_on: -1}).limit(10).lean().exec((err, threads) => {
-            if (err) return res.send('Something went wrong. Please try again.');
+            if (err) return res.status(500).send('Something went wrong. Please try again.');
 
             let addReplies = new Promise((res, rej) => {
               threads.forEach((thread, index, array) => {
                 db.Reply.find({thread_id: thread._id}).select('_id text created_on').sort({created_on: -1}).limit(3).lean().exec((err, replies) => {
-                  if (err) return res.send('Something went wrong. Please try again.');
+                  if (err) return rej('Something went wrong. Please try again.');
                   if (index == array.length - 1) res();
 
                   thread['replies'] = replies;
@@ -47,13 +46,21 @@ module.exports = function (app, db) {
             
             addReplies.then(() => {
               res.json(threads);
-            });
+            }).catch(err => res.status(500).send(err));
           });
         }
       });
     })
     .delete((req, res) => {
+      const board = req.params.board;
+      const thread_id = req.body.thread_id;
+      const password = req.body.delete_password;
 
+      helper.validateBoardAndThread(board, thread_id).then(result => {
+        if (result.delete_password != password) return res.json('incorrect password');
+
+        res.json('success');
+      }).catch(err => res.send(err));
     });
     
   app.route('/api/replies/:board')
@@ -63,34 +70,21 @@ module.exports = function (app, db) {
       const text = req.body.text;
       const password = req.body.delete_password;
 
-      let result = helper.createReply(board, thread_id, text, password);
-      if (typeof result == "string") return res.send(result);
-
-      res.redirect(`/b/${board}/${thread_id}`);
+      helper.createReply(board, thread_id, text, password).then((result) => {
+        res.redirect(`/b/${board}/${thread_id}`);
+      }).catch(err => res.status(500).send(err));
     })
     .get((req, res) => {
       const board = req.params.board;
       const thread = req.query.thread_id;
-      if (!thread) return res.send('Please input the thread id');
+      if (!thread) return res.status(400).send('Please input the thread id.');
 
-      db.Board.findOne({name: board}, (err, board) => {
-        if (err || !board) return res.send('Board does not exist');
-
-        if (board) {
-          let id = board._id;
-
-          db.Thread.findOne({_id: thread}).select('board_id _id text created_on bumped_on').lean().exec((err, thread) => {
-            if (!thread || err) return res.send('Thread does not exist');
-            if (thread.board_id.toString() != id.toString()) return res.send('Thread does not exist in this board');
-
-            delete thread.board_id;
-            db.Reply.find({thread_id: thread._id}).select('_id text created_on').lean().exec((err, replies) => {
-              thread['replies'] = replies;
-              thread['replycount'] = replies.length;
-              res.json(thread);
-            })
-          });
-        }
-      });
+      helper.validateBoardAndThread(board, thread, '_id text created_on bumped_on').then(result => {
+        db.Reply.find({thread_id: result._id}).select('_id text created_on').lean().exec((err, replies) => {
+          result['replies'] = replies;
+          result['replycount'] = replies.length;
+          res.json(result);
+        });
+      }).catch(err => res.status(400).send(err));;
     });
 };

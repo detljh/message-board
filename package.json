@@ -4,7 +4,7 @@
 	"main": "server.js",
 	"scripts": {
 		"start": "NODE_ENV=development nodemon server.js",
-		"test": "NODE_ENV=test mocha -u tdd tests/*"
+		"test": "NODE_ENV=test mocha --ui tdd tests/*"
 	},
 	"dependencies": {
 		"body-parser": "^1.15.2",

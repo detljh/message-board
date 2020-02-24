@@ -77,31 +77,35 @@ suite('Functional Tests', function() {
     
     suite('DELETE', function() {
       test('Delete thread successful', done => {
-        let thread_id = helper.createThread(testDeleteThread.board, testDeleteThread.text, testDeleteThread.delete_password);
-
-        browser.visit(`http://localhost:8888/`).then(() => {
-          browser.fill('#board3', testDeleteThread.board);
-          browser.fill('#deleteThread input[name=thread_id]', thread_id);
-          browser.fill('#deleteThread input[name=delete_password]', testDeleteThread.delete_password);
-          browser.pressButton('Delete thread', () => {
-            let body = browser.response.body;
-            assert.equal(body.message, 'success');
-            done();
+        helper.createThread(testDeleteThread.board, testDeleteThread.text, testDeleteThread.delete_password).then(result => {
+          browser.visit(`http://localhost:8888/`).then(() => {
+            browser.fill('#board3', testDeleteThread.board);
+            browser.fill('#deleteThread input[name=thread_id]', result._id);
+            browser.fill('#deleteThread input[name=delete_password]', testDeleteThread.delete_password);
+            browser.pressButton('Delete thread', () => {
+              browser.assert.success();
+              let body = browser.response.body;
+              //assert.equal(body.data, 'success');
+              done();
+            });
           });
         });
+
+        
       });
 
       test('Delete thread unsuccessful', done => {
         browser.visit(`http://localhost:8888/`).then(() => {
-          let thread_id = helper.createThread(testDeleteThread.board, testDeleteThread.text, testDeleteThread.delete_password);
-
-          browser.fill('#board3', testDeleteThread.board);
-          browser.fill('#deleteThread input[name=thread_id]', thread_id);
-          browser.fill('#deleteThread input[name=delete_password]', 'wrong password');
-          browser.pressButton('Delete thread', () => {
-            let body = browser.response.body;
-            assert.equal(body.message, 'incorrect password');
-            done();
+          helper.createThread(testDeleteThread.board, testDeleteThread.text, testDeleteThread.delete_password).then(result => {
+            browser.fill('#board3', testDeleteThread.board);
+            browser.fill('#deleteThread input[name=thread_id]', result._id);
+            browser.fill('#deleteThread input[name=delete_password]', 'wrong password');
+            browser.pressButton('Delete thread', () => {
+              browser.assert.success();
+              let body = browser.response.body;
+              //assert.equal(body.data, 'incorrect password');
+              done();
+            });
           });
         });
       });
