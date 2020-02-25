@@ -20,7 +20,7 @@
 		"mongoose": "^5.7.5"
 	},
 	"engines": {
-		"node": "4.4.3"
+		"node": "^4.4.3"
 	},
 	"keywords": [
 		"node",
