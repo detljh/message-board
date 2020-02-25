@@ -9,7 +9,13 @@ var cors        = require('cors');
 const helmet = require('helmet');
 const db = require('./db.js');
 const env = process.env.NODE_ENV || 'production';
-const config = require('./config.js')[env];
+const config = {
+  db: process.env.DATABASE,
+  port: 3000
+}
+if (env == 'test') {
+  config = require('./config.js')[env];
+}
 
 var apiRoutes         = require('./routes/api.js');
 var fccTestingRoutes  = require('./routes/fcctesting.js');
