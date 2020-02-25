@@ -8,7 +8,7 @@ var expect      = require('chai').expect;
 var cors        = require('cors');
 const helmet = require('helmet');
 const db = require('./db.js');
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || 'production';
 const config = require('./config.js')[env];
 
 var apiRoutes         = require('./routes/api.js');

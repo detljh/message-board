@@ -35,6 +35,16 @@ let testDeleteThread = {
   delete_password: 'what'
 };
 
+const findThread = (thread_id) => {
+  return new Promise((res, rej) => {
+    db.Thread.findOne({_id: thread_id}, (err, thread) => {
+      if (err) return rej(err);
+      if (!thread) return res(false);
+      return res(true);
+    })
+  });
+}
+
 suite('Functional Tests', function() {
   suiteSetup(() => {
     return Promise.all([db.Board.deleteMany({}), db.Reply.deleteMany({}), db.Thread.deleteMany({})]);
@@ -78,17 +88,35 @@ suite('Functional Tests', function() {
     suite('DELETE', function() {
       test('Delete thread successful', done => {
         helper.createThread(testDeleteThread.board, testDeleteThread.text, testDeleteThread.delete_password).then(result => {
-          browser.visit(`http://localhost:8888/`).then(() => {
-            browser.fill('#board3', testDeleteThread.board);
-            browser.fill('#deleteThread input[name=thread_id]', result._id);
-            browser.fill('#deleteThread input[name=delete_password]', testDeleteThread.delete_password);
-            browser.pressButton('Delete thread', () => {
-              browser.assert.success();
-              let body = browser.response.body;
-              //assert.equal(body.data, 'success');
-              done();
+          chai.request(server)
+            .del(`/api/threads/${testDeleteThread.board}`)
+            .send({thread_id: result._id, delete_password: testDeleteThread.delete_password})
+            .end(() => {
+              findThread(result._id).then(thread => {
+                assert.isFalse(thread);
+                done();
+              }).catch(err => {
+                console.log(err);
+                assert.fail();
+                done();
+              });
             });
-          });
+            // Below test not working -> request body remains empty
+          // browser.visit(`http://localhost:8888/`).then(() => {
+          //   browser.fill('#board3', testDeleteThread.board);
+          //   browser.fill('#deleteThread input[name=thread_id]', result._id);
+          //   browser.fill('#deleteThread input[name=delete_password]', testDeleteThread.delete_password);
+          //   browser.pressButton('Delete thread', () => {
+          //     browser.assert.success();
+          //     findThread(result._id).then(thread => {
+          //       assert.isFalse(thread);
+          //       done();
+          //     }).catch(err => {
+          //       console.log(err);
+          //       done();
+          //     });
+          //   });
+          // });
         });
 
         
@@ -97,15 +125,33 @@ suite('Functional Tests', function() {
       test('Delete thread unsuccessful', done => {
         browser.visit(`http://localhost:8888/`).then(() => {
           helper.createThread(testDeleteThread.board, testDeleteThread.text, testDeleteThread.delete_password).then(result => {
-            browser.fill('#board3', testDeleteThread.board);
-            browser.fill('#deleteThread input[name=thread_id]', result._id);
-            browser.fill('#deleteThread input[name=delete_password]', 'wrong password');
-            browser.pressButton('Delete thread', () => {
-              browser.assert.success();
-              let body = browser.response.body;
-              //assert.equal(body.data, 'incorrect password');
-              done();
+            chai.request(server)
+            .del(`/api/threads/${testDeleteThread.board}`)
+            .send({thread_id: result._id, delete_password: 'wrong password'})
+            .end(() => {
+              findThread(result._id).then(thread => {
+                assert.isTrue(thread);
+                done();
+              }).catch(err => {
+                console.log(err);
+                assert.fail();
+                done();
+              });
             });
+              // Below test not working -> request body remains empty
+            // browser.fill('#board3', testDeleteThread.board);
+            // browser.fill('#deleteThread input[name=thread_id]', result._id);
+            // browser.fill('#deleteThread input[name=delete_password]', 'wrong password');
+            // browser.pressButton('Delete thread', () => {
+            //   browser.assert.success();
+            //   findThread(result._id).then(thread => {
+            //     assert.isTrue(thread);
+            //     done();
+            //   }).catch(err => {
+            //     console.log(err);
+            //     done();
+            //   });
+            // });
           });
         });
       });

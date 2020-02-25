@@ -55,12 +55,20 @@ module.exports = function (app, db) {
       const board = req.params.board;
       const thread_id = req.body.thread_id;
       const password = req.body.delete_password;
-
       helper.validateBoardAndThread(board, thread_id).then(result => {
         if (result.delete_password != password) return res.json('incorrect password');
 
-        res.json('success');
-      }).catch(err => res.send(err));
+        db.Thread.deleteOne({_id: result._id}, (err) => {
+          if (err) return res.status(500).send('Thread could not be deleted.');
+          
+          db.Reply.deleteMany({thread_id: result._id}, (err) => {
+            res.json('success');
+          });
+        });
+      }).catch(err => res.status(400).send(err));
+    })
+    .put((req, res) => {
+      
     });
     
   app.route('/api/replies/:board')
