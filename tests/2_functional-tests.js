@@ -147,7 +147,7 @@ suite('Functional Tests', function() {
 
       test('Report thread in different board unsuccessful', (done) => {
         browser.visit("http://localhost:8888/").then(() => {
-          helper.createThread().then((result) => {
+          helper.createThread(testReport.board, testReport.text, testReport.delete_password).then((result) => {
             browser.fill('#board2', 'wrong board');
             browser.fill('#reportThread input[name=thread_id]', result._id);
             browser.pressButton('Report thread', () => {

@@ -17,6 +17,10 @@ let testDelete = test_helper.testDelete;
 let testReport = test_helper.testReport;
 
 suite('Unit Tests', function() {
+    suiteSetup(() => {
+        return Promise.all([db.Board.deleteMany({}), db.Reply.deleteMany({}), db.Thread.deleteMany({})]);
+    });
+
     test('createThread_Success', (done) => {
         helper.createThread(testThread.board, testThread.text, testThread.delete_password).then(thread => {
             db.Thread.findOne({_id: thread._id}, (err, thread) => {
@@ -62,7 +66,7 @@ suite('Unit Tests', function() {
    test('createReply_ThreadNotInBoard', (done) => {
         helper.createThread('another board', testThread.text, testThread.delete_password).then(diffThread => {
             helper.createThread(testThread.board, testThread.text, testThread.delete_password).then(thread => {
-                helper.createReply(diffThread.board, thread._id, testReply.text, testReply.delete_password).then(() => {})
+                helper.createReply('another board', thread._id, testReply.text, testReply.delete_password).then(() => {})
                 .catch((err) => {
                     assert.equal(err, 'Thread does not exist in this board.');
                 }).then(done, done);
@@ -102,7 +106,7 @@ suite('Unit Tests', function() {
     test('validateBoardAndThread_ThreadNotInBoard', (done) => {
         helper.createThread('another board', testThread.text, testThread.delete_password).then(diffThread => {
             helper.createThread(testThread.board, testThread.text, testThread.delete_password).then(thread => {
-                helper.validateBoardAndThread(diffThread.board, thread._id).then(() => {})
+                helper.validateBoardAndThread('another board', thread._id).then(() => {})
                 .catch((err) => {
                     assert.equal(err, 'Thread does not exist in this board.');
                 }).then(done, done);
