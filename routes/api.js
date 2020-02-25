@@ -14,12 +14,12 @@ var helper = require('./helper.js');
 module.exports = function (app, db) { 
   app.route('/api/threads/:board')
     .post((req, res) => {
-      const board = req.body.board;
+      const board = req.params.board;
       const text = req.body.text;
       const password = req.body.delete_password;
 
       helper.createThread(board, text, password).then(() => {
-        res.redirect(`/b/${board}`);
+        setTimeout(() => res.redirect(`/b/${board}`), 100);
       }).catch(err => res.status(500).send(err));
     })
     .get((req, res) => {
@@ -125,7 +125,7 @@ module.exports = function (app, db) {
       const board = req.params.board;
       const thread_id = req.body.thread_id;
       const reply_id = req.body.reply_id;
-      
+
       helper.validateBoardAndThread(board, thread_id).then(thread => {
         helper.validateThreadAndReply(thread_id, reply_id).then(reply => {
           db.Reply.updateOne({_id: reply_id}, {reported: true}, (err) => {
