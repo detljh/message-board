@@ -12,54 +12,16 @@ var assert = chai.assert;
 var server = require('../server');
 var Browser = require('zombie');
 var db = require('../db');
-const helper = require('../routes/helper.js');
+const helper = require('../utilities/helper.js');
+const test_helper = require('../utilities/test-helper.js');
+let testThread = test_helper.testThread;
+let testReply = test_helper.testReply;
+let testDelete = test_helper.testDelete;
+let testReport = test_helper.testReport;
 
 chai.use(chaiHttp);
 
 const browser = new Browser();
-
-let testThread = {
-  board: 'test',
-  text: 'text test',
-  delete_password: 'password'
-};
-
-let testReply = {
-  text: 'reply text',
-  delete_password: '1'
-};
-
-let testDelete = {
-  board: 'test',
-  text: 'to be deleted',
-  delete_password: 'what'
-};
-
-let testReport = {
-  board: 'test',
-  text: 'to be reported',
-  delete_password: 'report'
-};
-
-const findThread = (thread_id) => {
-  return new Promise((res, rej) => {
-    db.Thread.findOne({_id: thread_id}, (err, thread) => {
-      if (err) return rej(err);
-      if (!thread) return res([false, null]);
-      return res([true, thread]);
-    })
-  });
-}
-
-const findReply = (reply_id) => {
-  return new Promise((res, rej) => {
-    db.Reply.findOne({_id: reply_id}, (err, reply) => {
-      if (err) return rej(err);
-      if (!reply) return res([false, null]);
-      return res([true, reply]);
-    })
-  });
-}
 
 suite('Functional Tests', function() {
   suiteSetup(() => {
@@ -108,15 +70,11 @@ suite('Functional Tests', function() {
             .del(`/api/threads/${testDelete.board}`)
             .send({thread_id: result._id, delete_password: testDelete.delete_password})
             .end(() => {
-              findThread(result._id).then(data => {
+              test_helper.findThread(result._id).then(data => {
                 assert.isFalse(data[0]);
                 assert.isNull(data[1]);
                 done();
-              }).catch(err => {
-                console.log(err);
-                assert.fail();
-                done();
-              });
+              }).catch(done);
             });
             // Below test not working -> request body remains empty
           // browser.visit(`http://localhost:8888/`).then(() => {
@@ -134,9 +92,7 @@ suite('Functional Tests', function() {
           //     });
           //   });
           // });
-        });
-
-        
+        }).catch(done);
       });
 
       test('Delete thread unsuccessful', done => {
@@ -146,15 +102,11 @@ suite('Functional Tests', function() {
             .del(`/api/threads/${testDelete.board}`)
             .send({thread_id: result._id, delete_password: 'wrong password'})
             .end(() => {
-              findThread(result._id).then(data => {
+              test_helper.findThread(result._id).then(data => {
                 assert.isTrue(data[0]);
                 assert.isNotNull(data[1]);
                 done();
-              }).catch(err => {
-                console.log(err);
-                assert.fail();
-                done();
-              });
+              }).catch(done);
             });
               // Below test not working -> request body remains empty
             // browser.fill('#board3', testDelete.board);
@@ -170,7 +122,7 @@ suite('Functional Tests', function() {
             //     done();
             //   });
             // });
-          });
+          }).catch(done);
         });
       });
     });
@@ -182,14 +134,14 @@ suite('Functional Tests', function() {
             browser.fill('#board2', testReport.board);
             browser.fill('#reportThread input[name=thread_id]', result._id);
             browser.pressButton('Report thread', () => {
-              findThread(result._id).then((data) => {
+              test_helper.findThread(result._id).then((data) => {
                 assert.isTrue(data[0]);
                 assert.isNotNull(data[1]);
                 assert.isTrue(data[1].reported);
                 done();
-              });
+              }).catch(done);
             })
-          });
+          }).catch(done);
         });
       });
 
@@ -199,14 +151,14 @@ suite('Functional Tests', function() {
             browser.fill('#board2', 'wrong board');
             browser.fill('#reportThread input[name=thread_id]', result._id);
             browser.pressButton('Report thread', () => {
-              findThread(result._id).then((data) => {
+              test_helper.findThread(result._id).then((data) => {
                 assert.isTrue(data[0]);
                 assert.isNotNull(data[1]);
                 assert.isFalse(data[1].reported);
                 done();
-              });
+              }).catch(done);
             })
-          });
+          }).catch(done);
         });
       });
     });
@@ -261,14 +213,14 @@ suite('Functional Tests', function() {
             browser.fill('#reportReply input[name=thread_id]', testThread.id);
             browser.fill('#reportReply input[name=reply_id]', result._id)
             browser.pressButton('#reportReply input[type=submit]', () => {
-              findReply(result._id).then((data) => {
+              test_helper.findReply(result._id).then((data) => {
                 assert.isTrue(data[0], data[1]);
                 assert.isNotNull(data[1]);
                 assert.isTrue(data[1].reported, data[1]);
                 done();
-              });
+              }).catch(done);
             })
-          });
+          }).catch(done);
         });
       });
       
@@ -279,14 +231,14 @@ suite('Functional Tests', function() {
             browser.fill('#reportReply input[name=thread_id]', testThread.id);
             browser.fill('#reportReply input[name=reply_id]', result._id)
             browser.pressButton('#reportReply input[type=submit]', () => {
-              findReply(result._id).then((data) => {
+              test_helper.findReply(result._id).then((data) => {
                 assert.isTrue(data[0], data[1]);
                 assert.isNotNull(data[1]);
                 assert.isFalse(data[1].reported, data[1]);
                 done();
-              });
+              }).catch(done);
             })
-          });
+          }).catch(done);
         });
       });
     });
@@ -298,37 +250,29 @@ suite('Functional Tests', function() {
             .del(`/api/replies/${testThread.board}`)
             .send({thread_id: testThread.id, delete_password: testDelete.delete_password, reply_id: result._id})
             .end(() => {
-              findReply(result._id).then(data => {
+              test_helper.findReply(result._id).then(data => {
                 assert.isTrue(data[0], data[1]);
                 assert.equal(data[1].text, '[deleted]', data[1]);
                 done();
-              }).catch(err => {
-                console.log(err);
-                assert.fail();
-                done();
-              });
+              }).catch(done);
             });
-          });
+          }).catch(done);
         });
 
       test('Delete reply unsuccessful', done => {
         helper.createReply(testThread.board, testThread.id, testDelete.text, testDelete.delete_password).then(result => {
           chai.request(server)
-            .del(`/api/replies/${testThread.board}`)
-            .send({thread_id: testThread.id, delete_password: 'wrong password', reply_id: result._id})
-            .end(() => {
-              findReply(result._id).then(data => {
-                assert.isTrue(data[0], data[1]);
-                assert.equal(data[1].text, testDelete.text, data[1]);
-                done();
-              }).catch(err => {
-                console.log(err);
-                assert.fail();
-                done();
-              });
-            });
+          .del(`/api/replies/${testThread.board}`)
+          .send({thread_id: testThread.id, delete_password: 'wrong password', reply_id: result._id})
+          .end(() => {
+            test_helper.findReply(result._id).then(data => {
+              assert.isTrue(data[0], data[1]);
+              assert.equal(data[1].text, testDelete.text, data[1]);
+              done();
+            }).catch(done);
           });
-        });
+        }).catch(done);
+      });
     });
   });
 });

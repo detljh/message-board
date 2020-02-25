@@ -9,7 +9,7 @@
 'use strict';
 
 var expect = require('chai').expect;
-var helper = require('./helper.js');
+var helper = require('../utilities/helper.js');
 
 module.exports = function (app, db) { 
   app.route('/api/threads/:board')

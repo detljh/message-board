@@ -50,11 +50,11 @@ const createThread = (board, text, password) => {
 const createReply = (board, thread_id, text, password) => {
     return new Promise((res, rej) => {
         db.Board.findOne({name: board}, (err, board) => {
-            if (err || !board) return rej('Board does not exist');
+            if (err || !board) return rej('Board does not exist.');
     
             db.Thread.findOne({_id: thread_id}, (err, thread) => {
-                if (err || !thread) return rej('Thread does not exist');
-                if (thread.board_id.toString() != board._id.toString()) return rej('Thread does not exist in this board');
+                if (err || !thread) return rej('Thread does not exist.');
+                if (thread.board_id.toString() != board._id.toString()) return rej('Thread does not exist in this board.');
     
                 let date = new Date();
                 let newReply = db.Reply({
@@ -65,7 +65,7 @@ const createReply = (board, thread_id, text, password) => {
                 });
     
                 newReply.save((err, reply) => {
-                    if (err) return rej('Reply could not be saved');
+                    if (err) return rej('Reply could not be saved.');
                     
                     thread.bumped_on = date;
                     thread.save((err, thread) => {
