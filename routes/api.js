@@ -65,17 +65,19 @@ module.exports = function (app, db) {
             res.json('success');
           });
         });
-      }).catch(err => res.status(400).send(err));
+      }).catch(err => res.send(err));
     })
     .put((req, res) => {
       const board = req.params.board;
-      const thread_id = req.body.thread_id;
+      const thread_id = req.body.thread_id || req.body.report_id;
+
       helper.validateBoardAndThread(board, thread_id).then(result => {
         db.Thread.updateOne({_id: result._id}, {reported: true}, (err) => {
           if (err) return res.status(500).send('Thread could not be reported.');
+          
           res.json('success');
         });
-      }).catch(err => res.status(400).send(err));
+      }).catch(err => res.send(err));
     });
     
   app.route('/api/replies/:board')
