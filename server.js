@@ -45,7 +45,7 @@ app.route('/')
 fccTestingRoutes(app);
 
 //Database connection
-mongoose.connect(config.db, {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(config.db || process.env.DATABASE, {useNewUrlParser: true, useUnifiedTopology: true});
 
 //Routing for API
 apiRoutes(app, db);
@@ -61,8 +61,8 @@ app.use(function(req, res, next) {
 });
 
 //Start our server and tests!
-app.listen(process.env.PORT || config.port || 3000, function () {
-  console.log("Listening on port " + (process.env.PORT || config.port || 3000));
+app.listen(config.port || process.env.PORT, function () {
+  console.log("Listening on port " + (config.port || process.env.PORT));
   if(process.env.NODE_ENV==='test') {
     console.log('Running Tests...');
     setTimeout(function () {
