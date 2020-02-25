@@ -68,7 +68,14 @@ module.exports = function (app, db) {
       }).catch(err => res.status(400).send(err));
     })
     .put((req, res) => {
-      
+      const board = req.params.board;
+      const thread_id = req.body.thread_id;
+      helper.validateBoardAndThread(board, thread_id).then(result => {
+        db.Thread.updateOne({_id: result._id}, {reported: true}, (err) => {
+          if (err) return res.status(500).send('Thread could not be reported.');
+          res.json('success');
+        });
+      }).catch(err => res.status(400).send(err));
     });
     
   app.route('/api/replies/:board')

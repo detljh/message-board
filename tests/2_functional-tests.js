@@ -35,12 +35,18 @@ let testDeleteThread = {
   delete_password: 'what'
 };
 
+let testReportThread = {
+  board: 'test',
+  text: 'to be reported',
+  delete_password: 'report'
+};
+
 const findThread = (thread_id) => {
   return new Promise((res, rej) => {
     db.Thread.findOne({_id: thread_id}, (err, thread) => {
       if (err) return rej(err);
-      if (!thread) return res(false);
-      return res(true);
+      if (!thread) return res([false, null]);
+      return res([true, thread]);
     })
   });
 }
@@ -92,8 +98,9 @@ suite('Functional Tests', function() {
             .del(`/api/threads/${testDeleteThread.board}`)
             .send({thread_id: result._id, delete_password: testDeleteThread.delete_password})
             .end(() => {
-              findThread(result._id).then(thread => {
-                assert.isFalse(thread);
+              findThread(result._id).then(data => {
+                assert.isFalse(data[0]);
+                assert.isNull(data[1]);
                 done();
               }).catch(err => {
                 console.log(err);
@@ -129,8 +136,9 @@ suite('Functional Tests', function() {
             .del(`/api/threads/${testDeleteThread.board}`)
             .send({thread_id: result._id, delete_password: 'wrong password'})
             .end(() => {
-              findThread(result._id).then(thread => {
-                assert.isTrue(thread);
+              findThread(result._id).then(data => {
+                assert.isTrue(data[0]);
+                assert.isNotNull(data[1]);
                 done();
               }).catch(err => {
                 console.log(err);
@@ -158,10 +166,40 @@ suite('Functional Tests', function() {
     });
     
     suite('PUT', function() {
-      
-    });
-    
+      test('Report thread successful', (done) => {
+        browser.visit("http://localhost:8888/").then(() => {
+          helper.createThread(testReportThread.board, testReportThread.text, testReportThread.delete_password).then((result) => {
+            browser.fill('#board2', testReportThread.board);
+            browser.fill('#reportThread input[name=thread_id]', result._id);
+            browser.pressButton('Report thread', () => {
+              findThread(result._id).then((data) => {
+                assert.isTrue(data[0]);
+                assert.isNotNull(data[1]);
+                assert.isTrue(data[1].reported);
+                done();
+              });
+            })
+          });
+        });
+      });
 
+      test('Report thread in different board unsuccessful', (done) => {
+        browser.visit("http://localhost:8888/").then(() => {
+          helper.createThread(testReportThread.board, testReportThread.text, testReportThread.delete_password).then((result) => {
+            browser.fill('#board2', 'wrong board');
+            browser.fill('#reportThread input[name=thread_id]', result._id);
+            browser.pressButton('Report thread', () => {
+              findThread(result._id).then((data) => {
+                assert.isTrue(data[0]);
+                assert.isNotNull(data[1]);
+                assert.isFalse(data[1].reported);
+                done();
+              });
+            })
+          });
+        });
+      });
+    });
   });
   
   suite('API ROUTING FOR /api/replies/:board', function() {
