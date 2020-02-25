@@ -9,7 +9,7 @@ var cors        = require('cors');
 const helmet = require('helmet');
 const db = require('./db.js');
 const env = process.env.NODE_ENV || 'production';
-const config = {
+let config = {
   db: process.env.DATABASE,
   port: 3000
 }
@@ -51,7 +51,7 @@ app.route('/')
 fccTestingRoutes(app);
 
 //Database connection
-mongoose.connect(config.db || process.env.DATABASE, {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(config.db, {useNewUrlParser: true, useUnifiedTopology: true});
 
 //Routing for API
 apiRoutes(app, db);
@@ -67,8 +67,8 @@ app.use(function(req, res, next) {
 });
 
 //Start our server and tests!
-app.listen(config.port || process.env.PORT, function () {
-  console.log("Listening on port " + (config.port || process.env.PORT));
+app.listen(process.env.PORT || config.port, function () {
+  console.log("Listening on port " + (process.env.PORT || config.port));
   if(process.env.NODE_ENV==='test') {
     console.log('Running Tests...');
     setTimeout(function () {
