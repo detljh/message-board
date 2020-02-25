@@ -101,8 +101,27 @@ const validateBoardAndThread = (board, thread_id, fields='board_id _id text dele
     })
 }
 
+/*
+* Validate reply exists within the thread
+* @param thread_id ID of thread
+* @param reply_id ID of reply
+* @param fields Fields to select
+* @return Reply if successful otherwise error message 
+*/
+const validateThreadAndReply = (thread_id, reply_id, fields='thread_id _id text delete_password created_on reported') => {
+    return new Promise((res, rej) => {
+        db.Reply.findOne({_id: reply_id}).select(fields).lean().exec((err, reply) => {
+            if (err || !reply) return rej('Reply does not exist.');
+            if (thread_id.toString() != reply.thread_id.toString()) return rej('Reply does not exist in this thread.');
+            delete reply.thread_id;
+            return res(reply);
+        });  
+    });
+}
+
 module.exports = {
     createThread,
     createReply,
-    validateBoardAndThread
+    validateBoardAndThread,
+    validateThreadAndReply
 }

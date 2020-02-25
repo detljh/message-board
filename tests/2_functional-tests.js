@@ -29,13 +29,13 @@ let testReply = {
   delete_password: '1'
 };
 
-let testDeleteThread = {
+let testDelete = {
   board: 'test',
   text: 'to be deleted',
   delete_password: 'what'
 };
 
-let testReportThread = {
+let testReport = {
   board: 'test',
   text: 'to be reported',
   delete_password: 'report'
@@ -47,6 +47,16 @@ const findThread = (thread_id) => {
       if (err) return rej(err);
       if (!thread) return res([false, null]);
       return res([true, thread]);
+    })
+  });
+}
+
+const findReply = (reply_id) => {
+  return new Promise((res, rej) => {
+    db.Reply.findOne({_id: reply_id}, (err, reply) => {
+      if (err) return rej(err);
+      if (!reply) return res([false, null]);
+      return res([true, reply]);
     })
   });
 }
@@ -93,10 +103,10 @@ suite('Functional Tests', function() {
     
     suite('DELETE', function() {
       test('Delete thread successful', done => {
-        helper.createThread(testDeleteThread.board, testDeleteThread.text, testDeleteThread.delete_password).then(result => {
+        helper.createThread(testDelete.board, testDelete.text, testDelete.delete_password).then(result => {
           chai.request(server)
-            .del(`/api/threads/${testDeleteThread.board}`)
-            .send({thread_id: result._id, delete_password: testDeleteThread.delete_password})
+            .del(`/api/threads/${testDelete.board}`)
+            .send({thread_id: result._id, delete_password: testDelete.delete_password})
             .end(() => {
               findThread(result._id).then(data => {
                 assert.isFalse(data[0]);
@@ -110,9 +120,9 @@ suite('Functional Tests', function() {
             });
             // Below test not working -> request body remains empty
           // browser.visit(`http://localhost:8888/`).then(() => {
-          //   browser.fill('#board3', testDeleteThread.board);
+          //   browser.fill('#board3', testDelete.board);
           //   browser.fill('#deleteThread input[name=thread_id]', result._id);
-          //   browser.fill('#deleteThread input[name=delete_password]', testDeleteThread.delete_password);
+          //   browser.fill('#deleteThread input[name=delete_password]', testDelete.delete_password);
           //   browser.pressButton('Delete thread', () => {
           //     browser.assert.success();
           //     findThread(result._id).then(thread => {
@@ -131,9 +141,9 @@ suite('Functional Tests', function() {
 
       test('Delete thread unsuccessful', done => {
         browser.visit(`http://localhost:8888/`).then(() => {
-          helper.createThread(testDeleteThread.board, testDeleteThread.text, testDeleteThread.delete_password).then(result => {
+          helper.createThread(testDelete.board, testDelete.text, testDelete.delete_password).then(result => {
             chai.request(server)
-            .del(`/api/threads/${testDeleteThread.board}`)
+            .del(`/api/threads/${testDelete.board}`)
             .send({thread_id: result._id, delete_password: 'wrong password'})
             .end(() => {
               findThread(result._id).then(data => {
@@ -147,7 +157,7 @@ suite('Functional Tests', function() {
               });
             });
               // Below test not working -> request body remains empty
-            // browser.fill('#board3', testDeleteThread.board);
+            // browser.fill('#board3', testDelete.board);
             // browser.fill('#deleteThread input[name=thread_id]', result._id);
             // browser.fill('#deleteThread input[name=delete_password]', 'wrong password');
             // browser.pressButton('Delete thread', () => {
@@ -168,8 +178,8 @@ suite('Functional Tests', function() {
     suite('PUT', function() {
       test('Report thread successful', (done) => {
         browser.visit("http://localhost:8888/").then(() => {
-          helper.createThread(testReportThread.board, testReportThread.text, testReportThread.delete_password).then((result) => {
-            browser.fill('#board2', testReportThread.board);
+          helper.createThread(testReport.board, testReport.text, testReport.delete_password).then((result) => {
+            browser.fill('#board2', testReport.board);
             browser.fill('#reportThread input[name=thread_id]', result._id);
             browser.pressButton('Report thread', () => {
               findThread(result._id).then((data) => {
@@ -185,7 +195,7 @@ suite('Functional Tests', function() {
 
       test('Report thread in different board unsuccessful', (done) => {
         browser.visit("http://localhost:8888/").then(() => {
-          helper.createThread(testReportThread.board, testReportThread.text, testReportThread.delete_password).then((result) => {
+          helper.createThread().then((result) => {
             browser.fill('#board2', 'wrong board');
             browser.fill('#reportThread input[name=thread_id]', result._id);
             browser.pressButton('Report thread', () => {
@@ -244,13 +254,81 @@ suite('Functional Tests', function() {
     });
     
     suite('PUT', function() {
+      test('Report reply successful', (done) => {
+        browser.visit("http://localhost:8888/").then(() => {
+          helper.createReply(testThread.board, testThread.id, testReport.text, testReport.delete_password).then((result) => {
+            browser.fill('#board5', testThread.board);
+            browser.fill('#reportReply input[name=thread_id]', testThread.id);
+            browser.fill('#reportReply input[name=reply_id]', result._id)
+            browser.pressButton('#reportReply input[type=submit]', () => {
+              findReply(result._id).then((data) => {
+                assert.isTrue(data[0], data[1]);
+                assert.isNotNull(data[1]);
+                assert.isTrue(data[1].reported, data[1]);
+                done();
+              });
+            })
+          });
+        });
+      });
       
+      test('Report reply in wrong board unsuccessful', (done) => {
+        browser.visit("http://localhost:8888/").then(() => {
+          helper.createReply(testThread.board, testThread.id, testReport.text, testReport.delete_password).then((result) => {
+            browser.fill('#board5', 'wrong board');
+            browser.fill('#reportReply input[name=thread_id]', testThread.id);
+            browser.fill('#reportReply input[name=reply_id]', result._id)
+            browser.pressButton('#reportReply input[type=submit]', () => {
+              findReply(result._id).then((data) => {
+                assert.isTrue(data[0], data[1]);
+                assert.isNotNull(data[1]);
+                assert.isFalse(data[1].reported, data[1]);
+                done();
+              });
+            })
+          });
+        });
+      });
     });
     
     suite('DELETE', function() {
-      
-    });
-    
-  });
+      test('Delete reply successful', done => {
+        helper.createReply(testThread.board, testThread.id, testDelete.text, testDelete.delete_password).then(result => {
+          chai.request(server)
+            .del(`/api/replies/${testThread.board}`)
+            .send({thread_id: testThread.id, delete_password: testDelete.delete_password, reply_id: result._id})
+            .end(() => {
+              findReply(result._id).then(data => {
+                assert.isTrue(data[0], data[1]);
+                assert.equal(data[1].text, '[deleted]', data[1]);
+                done();
+              }).catch(err => {
+                console.log(err);
+                assert.fail();
+                done();
+              });
+            });
+          });
+        });
 
+      test('Delete reply unsuccessful', done => {
+        helper.createReply(testThread.board, testThread.id, testDelete.text, testDelete.delete_password).then(result => {
+          chai.request(server)
+            .del(`/api/replies/${testThread.board}`)
+            .send({thread_id: testThread.id, delete_password: 'wrong password', reply_id: result._id})
+            .end(() => {
+              findReply(result._id).then(data => {
+                assert.isTrue(data[0], data[1]);
+                assert.equal(data[1].text, testDelete.text, data[1]);
+                done();
+              }).catch(err => {
+                console.log(err);
+                assert.fail();
+                done();
+              });
+            });
+          });
+        });
+    });
+  });
 });

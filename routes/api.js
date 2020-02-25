@@ -55,6 +55,7 @@ module.exports = function (app, db) {
       const board = req.params.board;
       const thread_id = req.body.thread_id;
       const password = req.body.delete_password;
+
       helper.validateBoardAndThread(board, thread_id).then(result => {
         if (result.delete_password != password) return res.json('incorrect password');
 
@@ -103,5 +104,35 @@ module.exports = function (app, db) {
           res.json(result);
         });
       }).catch(err => res.status(400).send(err));;
+    })
+    .delete((req, res) => {
+      const board = req.params.board;
+      const thread_id = req.body.thread_id;
+      const password = req.body.delete_password;
+      const reply_id = req.body.reply_id;
+      
+      helper.validateBoardAndThread(board, thread_id).then(thread => {
+        helper.validateThreadAndReply(thread_id, reply_id).then(reply => {
+          if (reply.delete_password != password) return res.send('incorrect password');
+          db.Reply.updateOne({_id: reply_id}, {text: '[deleted]'}, (err) => {
+            if (err) res.send('Reply could not be deleted.');
+            res.json('success');
+          })
+        }).catch(err => res.send(err));
+      }).catch(err => res.send(err));
+    })
+    .put((req, res) => {
+      const board = req.params.board;
+      const thread_id = req.body.thread_id;
+      const reply_id = req.body.reply_id;
+      
+      helper.validateBoardAndThread(board, thread_id).then(thread => {
+        helper.validateThreadAndReply(thread_id, reply_id).then(reply => {
+          db.Reply.updateOne({_id: reply_id}, {reported: true}, (err) => {
+            if (err) res.send('Reply could not be reported.');
+            res.json('success');
+          })
+        }).catch(err => res.send(err));
+      }).catch(err => res.send(err));
     });
 };
