@@ -137,9 +137,17 @@ module.exports = function (app, db) {
     });
 
   app.route('/api/boards')
-    .get((req, res) => {
-      db.Board.find({}, (err, boards) => {
-        if (err) res.status(500).send(helper.DB_ERR);
+    .post((req, res) => {
+      const searchText = req.body.board; 
+      
+      let query = {};
+      if (searchText) {
+        query = {name: {$regex: searchText, $options: "i"}}
+      }
+      
+      db.Board.find(query, (err, boards) => {
+        if (err) return res.status(500).send(helper.DB_ERR);
+        if (!boards) return res.json([]);
         res.json(boards);
       })
     })
