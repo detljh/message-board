@@ -1,10 +1,24 @@
+@import url('https://fonts.googleapis.com/css?family=Varela+Round&display=swap');
+
 * {
   margin: 0px;
   padding: 0px;
+  font-family: 'Varela Round';
+  font-size: 1em;
+  color: black;
+}
+
+a {
+  text-decoration: none; 
 }
 
 body {
   padding: 10px;
+}
+
+#title {
+  text-align: center;
+  font-size: 2em;
 }
 
 .replies {
@@ -31,6 +45,3 @@ body {
   font-size: 10.5px;
 }
 
-#submitNewThread {
-  margin: 50px;
-}

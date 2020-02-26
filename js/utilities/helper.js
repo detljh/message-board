@@ -1,4 +1,9 @@
-var db = require('../db.js');
+var db = require('../../db.js');
+
+const DB_ERR = 'Something went wrong. Please try again.';
+const THREAD_EXIST_ERR = 'Thread does not exist.';
+const BOARD_EXIST_ERR = 'Board does not exist.';
+const REPLY_EXIST_ERR = 'Reply does not exist.';
 
 /*
 * Create a new thread
@@ -10,7 +15,7 @@ var db = require('../db.js');
 const createThread = (board, text, password) => {
     return new Promise((res, rej) => {
         db.Board.findOne({name: board}, (err, doc) => {
-            if (err) return rej('Something went wrong. Please try again.');
+            if (err) return rej(DB_ERR);
     
             if (!doc) {
                 doc = db.Board({
@@ -50,10 +55,10 @@ const createThread = (board, text, password) => {
 const createReply = (board, thread_id, text, password) => {
     return new Promise((res, rej) => {
         db.Board.findOne({name: board}, (err, board) => {
-            if (err || !board) return rej('Board does not exist.');
+            if (err || !board) return rej(BOARD_EXIST_ERR);
     
             db.Thread.findOne({_id: thread_id}, (err, thread) => {
-                if (err || !thread) return rej('Thread does not exist.');
+                if (err || !thread) return rej(THREAD_EXIST_ERR);
                 if (thread.board_id.toString() != board._id.toString()) return rej('Thread does not exist in this board.');
     
                 let date = new Date();
@@ -69,7 +74,7 @@ const createReply = (board, thread_id, text, password) => {
                     
                     thread.bumped_on = date;
                     thread.save((err, thread) => {
-                        if (err) return rej('Something went wrong. Please try again.');
+                        if (err) return rej(DB_ERR);
                         return res(reply);
                     });
                 });
@@ -88,11 +93,11 @@ const createReply = (board, thread_id, text, password) => {
 const validateBoardAndThread = (board, thread_id, fields='board_id _id text delete_password created_on bumped_on reported') => {
     return new Promise((res, rej) => {
         db.Board.findOne({name: board}, (err, board) => {
-            if (err || !board) return rej('Board does not exist.');
+            if (err || !board) return rej(BOARD_EXIST_ERR);
             
             let id = board._id;
             db.Thread.findOne({_id: thread_id}).select(fields + ' board_id').lean().exec((err, thread) => {
-                if (!thread || err) return rej('Thread does not exist.');
+                if (!thread || err) return rej(THREAD_EXIST_ERR);
                 if (thread.board_id.toString() != id.toString()) return rej('Thread does not exist in this board.');
                 delete thread.board_id;
                 return res(thread);
@@ -111,7 +116,7 @@ const validateBoardAndThread = (board, thread_id, fields='board_id _id text dele
 const validateThreadAndReply = (thread_id, reply_id, fields='thread_id _id text delete_password created_on reported') => {
     return new Promise((res, rej) => {
         db.Reply.findOne({_id: reply_id}).select(fields).lean().exec((err, reply) => {
-            if (err || !reply) return rej('Reply does not exist.');
+            if (err || !reply) return rej(REPLY_EXIST_ERR);
             if (thread_id.toString() != reply.thread_id.toString()) return rej('Reply does not exist in this thread.');
             delete reply.thread_id;
             return res(reply);
@@ -123,5 +128,9 @@ module.exports = {
     createThread,
     createReply,
     validateBoardAndThread,
-    validateThreadAndReply
-}
+    validateThreadAndReply,
+    DB_ERR,
+    REPLY_EXIST_ERR,
+    THREAD_EXIST_ERR,
+    BOARD_EXIST_ERR
+};

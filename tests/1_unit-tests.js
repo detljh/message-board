@@ -8,8 +8,8 @@
 
 var chai = require('chai');
 var assert = chai.assert;
-const helper = require('../utilities/helper.js');
-const test_helper = require('../utilities/test-helper.js');
+const helper = require('../js/utilities/helper.js');
+const test_helper = require('../js/utilities/test-helper.js');
 const db = require('../db.js');
 let testThread = test_helper.testThread;
 let testReply = test_helper.testReply;

@@ -12,8 +12,8 @@ var assert = chai.assert;
 var server = require('../server');
 var Browser = require('zombie');
 var db = require('../db');
-const helper = require('../utilities/helper.js');
-const test_helper = require('../utilities/test-helper.js');
+const helper = require('../js/utilities/helper.js');
+const test_helper = require('../js/utilities/test-helper.js');
 let testThread = test_helper.testThread;
 let testReply = test_helper.testReply;
 let testDelete = test_helper.testDelete;
@@ -31,7 +31,7 @@ suite('Functional Tests', function() {
   suite('API ROUTING FOR /api/threads/:board', function() {
     suite('POST', function() {
       test('New thread created', (done) => {
-        browser.visit("http://localhost:8888/").then(() => {
+        browser.visit("http://localhost:8888/api").then(() => {
           browser.fill('#board1', testThread.board);
           browser.fill('#newThread textarea[name=text]', testThread.text);
           browser.fill('#newThread input[name=delete_password]', testThread.delete_password);
@@ -96,7 +96,7 @@ suite('Functional Tests', function() {
       });
 
       test('Delete thread unsuccessful', done => {
-        browser.visit(`http://localhost:8888/`).then(() => {
+        browser.visit(`http://localhost:8888/api`).then(() => {
           helper.createThread(testDelete.board, testDelete.text, testDelete.delete_password).then(result => {
             chai.request(server)
             .del(`/api/threads/${testDelete.board}`)
@@ -129,7 +129,7 @@ suite('Functional Tests', function() {
     
     suite('PUT', function() {
       test('Report thread successful', (done) => {
-        browser.visit("http://localhost:8888/").then(() => {
+        browser.visit("http://localhost:8888/api").then(() => {
           helper.createThread(testReport.board, testReport.text, testReport.delete_password).then((result) => {
             browser.fill('#board2', testReport.board);
             browser.fill('#reportThread input[name=thread_id]', result._id);
@@ -146,7 +146,7 @@ suite('Functional Tests', function() {
       });
 
       test('Report thread in different board unsuccessful', (done) => {
-        browser.visit("http://localhost:8888/").then(() => {
+        browser.visit("http://localhost:8888/api").then(() => {
           helper.createThread(testReport.board, testReport.text, testReport.delete_password).then((result) => {
             browser.fill('#board2', 'wrong board');
             browser.fill('#reportThread input[name=thread_id]', result._id);
@@ -168,7 +168,7 @@ suite('Functional Tests', function() {
     
     suite('POST', function() {
       test('New reply created', (done) => {
-        browser.visit("http://localhost:8888/").then(() => {
+        browser.visit("http://localhost:8888/api").then(() => {
           browser.fill('#board4', testThread.board);
           browser.fill('#newReply input[name=thread_id]', testThread.id);
           browser.fill('#newReply textarea[name=text]', testReply.text);
@@ -207,7 +207,7 @@ suite('Functional Tests', function() {
     
     suite('PUT', function() {
       test('Report reply successful', (done) => {
-        browser.visit("http://localhost:8888/").then(() => {
+        browser.visit("http://localhost:8888/api").then(() => {
           helper.createReply(testThread.board, testThread.id, testReport.text, testReport.delete_password).then((result) => {
             browser.fill('#board5', testThread.board);
             browser.fill('#reportReply input[name=thread_id]', testThread.id);
@@ -225,7 +225,7 @@ suite('Functional Tests', function() {
       });
       
       test('Report reply in wrong board unsuccessful', (done) => {
-        browser.visit("http://localhost:8888/").then(() => {
+        browser.visit("http://localhost:8888/api").then(() => {
           helper.createReply(testThread.board, testThread.id, testReport.text, testReport.delete_password).then((result) => {
             browser.fill('#board5', 'wrong board');
             browser.fill('#reportReply input[name=thread_id]', testThread.id);
@@ -274,5 +274,33 @@ suite('Functional Tests', function() {
         }).catch(done);
       });
     });
+  });
+
+  suite('UI TESTING FOR /', () => {
+    test('New thread created', (done) => {
+      browser.visit("http://localhost:8888/").then(() => {
+        browser.fill('#new-thread input[name=board]', 'new board');
+        browser.fill('#new-thread input[name=text]', testThread.text);
+        browser.fill('#new-thread input[name=delete_password]', testThread.delete_password);
+        browser.pressButton('#new-thread input[type=submit]', () => {
+          browser.assert.success();
+          browser.assert.redirected();
+          browser.assert.text('#boardTitle', 'Welcome to /b/new%20board');
+          browser.assert.url({pathname: '/b/new%20board'});
+          browser.assert.element('#submitNewThread');
+          browser.assert.element('.thread');
+          browser.assert.text('.thread .main h3', 'text test');
+          done();
+        });
+      });
+    });
+  });
+
+  suite('UI TESTING FOR /b/:board', () => {
+
+  });
+
+  suite('UI TESTING FOR /b/:board/:threadid', () => {
+
   });
 });

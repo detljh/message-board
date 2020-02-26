@@ -17,25 +17,25 @@ module.exports = function (app, db) {
       const board = req.params.board;
       const text = req.body.text;
       const password = req.body.delete_password;
-
+      
       helper.createThread(board, text, password).then(() => {
         setTimeout(() => res.redirect(`/b/${board}`), 100);
       }).catch(err => res.status(500).send(err));
     })
     .get((req, res) => {
       db.Board.findOne({name: req.params.board}, (err, board) => {
-        if (err || !board) return res.status(400).send('Board does not exist.');
+        if (err || !board) return res.status(400).send(helper.BOARD_EXIST_ERR);
 
         if (board) {
           let id = board._id;
 
           db.Thread.find({board_id: id}).select('_id text created_on bumped_on').sort({bumped_on: -1}).limit(10).lean().exec((err, threads) => {
-            if (err) return res.status(500).send('Something went wrong. Please try again.');
+            if (err) return res.status(500).send(helper.DB_ERR);
 
             let addReplies = new Promise((res, rej) => {
               threads.forEach((thread, index, array) => {
                 db.Reply.find({thread_id: thread._id}).select('_id text created_on').sort({created_on: -1}).limit(3).lean().exec((err, replies) => {
-                  if (err) return rej('Something went wrong. Please try again.');
+                  if (err) return rej(helper.DB_ERR);
                   if (index == array.length - 1) res();
 
                   thread['replies'] = replies;
@@ -135,4 +135,12 @@ module.exports = function (app, db) {
         }).catch(err => res.send(err));
       }).catch(err => res.send(err));
     });
+
+  app.route('/api/boards')
+    .get((req, res) => {
+      db.Board.find({}, (err, boards) => {
+        if (err) res.status(500).send(helper.DB_ERR);
+        res.json(boards);
+      })
+    })
 };

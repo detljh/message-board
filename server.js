@@ -13,12 +13,12 @@ let config = {
   db: process.env.DATABASE,
   port: 3000
 }
-if (env == 'test') {
+if (env != 'production') {
   config = require('./config.js')[env];
 }
 
-var apiRoutes         = require('./routes/api.js');
-var fccTestingRoutes  = require('./routes/fcctesting.js');
+var apiRoutes         = require('./js/routes/api.js');
+var fccTestingRoutes  = require('./js/routes/fcctesting.js');
 var runner            = require('./test-runner');
 
 var app = express();
@@ -45,6 +45,11 @@ app.route('/b/:board/:threadid')
 app.route('/')
   .get(function (req, res) {
     res.sendFile(process.cwd() + '/views/index.html');
+  });
+
+app.route('/api')
+  .get((req, res) => {
+    res.sendFile(process.cwd() + '/views/api.html')
   });
 
 //For FCC testing purposes

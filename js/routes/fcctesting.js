@@ -29,7 +29,7 @@
 
 var cors = require('cors');
 var fs = require('fs');
-var runner = require('../test-runner');
+var runner = require('../../test-runner');
 
 module.exports = function (app) {
 
