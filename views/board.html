@@ -11,25 +11,27 @@
     <link rel="stylesheet" href="/public/board.css">
   </head>
   <body>
-    <header>
+    <header id="top-bar">
       <h1 id="title">
         <a href="/">Message Board</a>
       </h1>
-      <h2 id='boardTitle'></h2>
     </header>
 
-    <div id='submitNewThread'>
-      <h3>Submit a new thread:</h3>
-      <form id="newThread" method="post" action="/api/">
-        <textarea rows="8" cols="120" type='text' placeholder='Thread text...' name='text' required=''></textarea><br>
-        <input type='text' placeholder='password to delete' name='delete_password'><br>
-        <input type="submit" value="Submit">
-      </form>
-    </div>
-    
-    <div id='boardDisplay'></div>
-    
-    <hr style='margin: 50px; margin-top: 200px'>
+    <main>
+      <h2 id='boardTitle'></h2>
+      <div id='submitNewThread'>
+        <h3>Submit a new thread:</h3>
+        <form id="newThread" method="post" action="/api/">
+          <textarea rows="8" cols="120" type='text' placeholder='Thread text...' name='text' required=''></textarea><br>
+          <input type='text' placeholder='password to delete' name='delete_password'><br>
+          <input type="submit" value="Submit">
+        </form>
+      </div>
+      
+      <div id='boardDisplay'></div>
+      
+      <hr style='margin: 50px; margin-top: 200px'>
+    </main>
     
     <script src="https://code.jquery.com/jquery-2.2.1.min.js"
             integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="

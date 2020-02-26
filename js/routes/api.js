@@ -19,7 +19,7 @@ module.exports = function (app, db) {
       const password = req.body.delete_password;
       
       helper.createThread(board, text, password).then(() => {
-        setTimeout(() => res.redirect(`/b/${board}`), 100);
+        res.redirect(`/b/${board}`);
       }).catch(err => res.status(500).send(err));
     })
     .get((req, res) => {

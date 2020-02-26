@@ -13,8 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
         parent.appendChild(newElement);
     };
 
-    removeChildrenFromParent = (parentId) => {
+    removeChildrenFromParent = (parentId, childTag='') => {
         const parent = document.getElementById(parentId);
+        if (childTag.length > 0) {
+            parent.removeChild(childTag);
+            return;
+        }
+
         let child = parent.lastElementChild
         while (child) {
             parent.removeChild(child);
@@ -28,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             board = event.target.elements['board'].value;
             event.preventDefault();
         }
-        
+
         const http = new XMLHttpRequest();
         http.open("POST", '/api/boards', true);
         http.setRequestHeader('Content-Type', 'application/json');
@@ -50,4 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const searchBoard = document.getElementById('search-board');
     searchBoard.addEventListener("submit", getBoards);
+
+    const info = document.getElementById('info');
+    info.addEventListener("click", () => {
+        const block = document.getElementById('info-block');
+        if (block.style.display != "block") {
+            block.style.display = "block";
+        } else {
+            block.style.display = "none";
+        }
+    });
 });
