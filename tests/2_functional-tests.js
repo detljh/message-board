@@ -294,6 +294,22 @@ suite('Functional Tests', function() {
         });
       });
     });
+
+    test('Search boards', (done) => {
+      browser.visit("http://localhost:8888/").then(() => {
+        browser.assert.elements('.board-name', 2);
+        browser.fill('#search-board input[name=board]', 'a');
+        browser.pressButton('#search-board input[type=submit]', () => {
+          browser.assert.success();
+          browser.assert.element('.board-name');
+          browser.fill('#search-board input[name=board]', '');
+          browser.pressButton('#search-board input[type=submit]', () => {
+            browser.assert.elements('.board-name', 2);
+            done();
+          });
+        });
+      });
+    });
   });
 
   suite('UI TESTING FOR /b/:board', () => {
