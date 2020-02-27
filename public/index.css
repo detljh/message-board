@@ -1,13 +1,48 @@
+@import './variables.css';
+
 .container {
-    border: 1px solid black;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 1em;
     margin: 1.5em 6em;
+    background-color: white;
+}
+
+#visit-boards {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin: 1.5em 0;
+    border: none;
+    background-color: transparent;
+}
+
+#visit-boards > div {
+    margin: 1.5em 0;
+}
+
+#random-board {
+    width: 40%;
+}
+
+#new-boards {
+    width: 40%;
 }
 
 .board-name {
     display: inline-block;
-    border: 1px solid red;
+    background-color: var(--main-color);
     padding: 5px;
-    margin: 2px; 
+    margin: 2px;
+    opacity: 1;
+    transition: var(--opacity-transition-in);
+}
+
+.board-name a {
+    color: white;
+}
+
+.board-name:hover {
+    opacity: 0.5;
+    transition: var(--opacity-transition-out);
 }

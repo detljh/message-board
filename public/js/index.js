@@ -59,10 +59,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const info = document.getElementById('info');
     info.addEventListener("click", () => {
         const block = document.getElementById('info-block');
-        if (block.style.display != "block") {
-            block.style.display = "block";
+        if (block.classList.contains('hidden')) {
+            block.classList.remove('hidden');
+            block.classList.remove('block');
+            block.classList.add('visible');
+            info.style.animationName = 'clicked';
+            info.style.animationFillMode = 'forwards';
         } else {
-            block.style.display = "none";
+            block.classList.remove('visible');
+            block.classList.add('hidden');
+            info.style.animationName = '';
         }
     });
 });
