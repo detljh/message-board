@@ -1,13 +1,5 @@
 @import './variables.css';
 
-.container {
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 1em;
-    margin: 1.5em 6em;
-    background-color: white;
-}
-
 #visit-boards {
     display: flex;
     flex-direction: row;
@@ -15,6 +7,7 @@
     margin: 1.5em 0;
     border: none;
     background-color: transparent;
+    align-items: flex-start;
 }
 
 #visit-boards > div {
@@ -23,6 +16,11 @@
 
 #all-boards {
     text-align: center;
+}
+
+#search-board input {
+    margin: 0px 10px;
+    vertical-align: middle;
 }
 
 #boards {
@@ -40,7 +38,7 @@
 #new-board {
     width: 40%;
     text-align: center;
-}
+} 
 
 .board-name {
     display: inline-block;

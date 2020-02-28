@@ -10,13 +10,40 @@ html, body {
   color: black;
   padding: 10px;
   background-color: var(--bg-color);
+  overflow-wrap: break-word;
 }
 
 a {
   text-decoration: none; 
   outline: none;
   cursor: pointer;
-  color: black;
+  color: var(--main-color);
+}
+
+a {
+  opacity: 1;
+  transition: var(--opacity-transition-in);
+}
+
+a:hover {
+  opacity: 0.5;
+  transition: var(--opacity-transition-out);
+}
+
+.container {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1em;
+  margin: 1.5em 6em;
+  background-color: white;
+}
+
+#new-thread input {
+  margin-bottom: 7px;
+}
+
+#new-thread button {
+  margin-top: 5px;
 }
 
 #main {
@@ -48,6 +75,11 @@ a {
   text-align: center;
   font-size: 2em;
   font-weight: bold;
+}
+
+#title a {
+  color: black;
+  opacity: 1;
 }
 
 #info {
@@ -155,36 +187,41 @@ a {
 }
 
 .thread {
-  border: 2px solid black;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
   padding: 5px;
   margin-bottom: 5px;
+  background-color: white;
+  font-size: 0.9em;
 }
 
 .id {
-  font-size: 10.5px;
+  font-size: 0.6em;
+}
+
+.reply-count {
+  font-size: 0.7em;
+}
+
+hr {
+  border-color: var(--bg-color);
+  margin: 20px 0px;
 }
 
 label {
   font-size:0.7em;
 }
 
-#search-board input {
-  margin: 0px 10px;
-  vertical-align: middle;
-}
-
-#new-thread input {
-  margin-bottom: 7px;
-}
-
-#new-thread button {
-  margin-top: 5px;
-}
-
-form input {
+form input, textarea {
   outline: none;
   border: 2px solid var(--secondary-color);
   padding: 2px;
+  width: 70%;
+}
+
+form textarea {
+  resize: none;
+  height: 50px;
 }
 
 form button {
@@ -202,13 +239,13 @@ form button[type=submit] {
   border-radius: 15px;
 }
 
-form button i {
+i {
   color: var(--secondary-color);
   opacity: 1;
   transition: var(--opacity-transition-in);
 }
 
-form button i:hover {
+i:hover {
   opacity: 0.5;
   transition: var(--opacity-transition-out);
 }
@@ -216,6 +253,14 @@ form button i:hover {
 form button[type=submit]:hover {
   opacity: 0.5;
   transition: var(--opacity-transition-out);
+}
+
+#scroll-top i {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 1.5em;
+  color: var(--main-color);
 }
 
 @media (max-width: 768px) {

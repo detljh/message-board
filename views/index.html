@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="./public/main.css">
     <link rel="stylesheet" href="./public/index.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-    <script src="./public/js/index.js"></script>
+    <script src="/public/js/functions.js"></script>
+    <script src="/public/js/index.js"></script>
   </head>
   <body>
     <header id="top-bar">
@@ -30,7 +31,7 @@
     <main id="main">
       <div class="container" id="all-boards">
         <h2 class="container-title">
-          Visit an existing board!
+          Visit an existing board
         </h2>
         <form id="search-board">
           <label>
@@ -49,7 +50,7 @@
 
         <div class="container" id="new-board">
           <h2 class="container-title">
-            Create a new thread!
+            Create a new thread
           </h2>
           <form id="new-thread" action="/api/threads/" method="post">
             <label>
@@ -62,7 +63,7 @@
               Thread text
             </label>
             <br>
-            <input type="text" name="text" required>
+            <textarea name="text" required></textarea>
             <br>
             <label>
               Delete password

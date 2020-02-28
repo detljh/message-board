@@ -38,12 +38,12 @@ module.exports = function (app, db) {
 
             let addReplies = new Promise((res, rej) => {
               threads.forEach((thread, index, array) => {
-                db.Reply.find({thread_id: thread._id}).select('_id text created_on').sort({created_on: -1}).limit(3).lean().exec((err, replies) => {
+                db.Reply.find({thread_id: thread._id}).select('_id text created_on').sort({created_on: -1}).lean().exec((err, replies) => {
                   if (err) return rej(helper.DB_ERR);
                   if (index == array.length - 1) res();
 
-                  thread['replies'] = replies;
                   thread['replycount'] = replies.length;
+                  thread['replies'] = replies.slice(0, 3);
                 });
               });
             });
