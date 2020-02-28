@@ -17,6 +17,10 @@ module.exports = function (app, db) {
       const board = req.params.board;
       const text = req.body.text;
       const password = req.body.delete_password;
+
+      if (board.includes(' ')) {
+        return res.status(400).send('Spaces are not allowed in board names.');
+      }
       
       helper.createThread(board, text, password).then(() => {
         res.redirect(`/b/${board}`);
@@ -149,6 +153,28 @@ module.exports = function (app, db) {
         if (err) return res.status(500).send(helper.DB_ERR);
         if (!boards) return res.json([]);
         res.json(boards);
-      })
-    })
+      });
+    });
+  
+  app.route('/api/thread')
+    .get((req, res) => {
+      db.Thread.countDocuments().exec((err, count) => {
+        if (err) return res.status(500).send(helper.DB_ERR);
+        let random = Math.floor(Math.random() * count);
+
+        db.Thread.findOne().skip(random).lean().exec((err, thread) => {
+          if (err) return res.status(500).send(helper.DB_ERR);
+          db.Reply.find({thread_id: thread._id}).lean().exec((err, replies) => {
+            if (err) return rej(helper.DB_ERR);
+            thread['replycount'] = replies.length;
+
+            db.Board.findOne({_id: thread.board_id}, (err, board) => {
+              if (err) return res.status(500).send(helper.DB_ERR);
+              thread['board'] = board.name;
+              res.json(thread);
+            });
+          });
+        });
+      });
+    });
 };

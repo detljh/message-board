@@ -47,7 +47,7 @@ suite('Unit Tests', function() {
 
     test('createReply_WrongBoard', (done) => {
          helper.createThread(testThread.board, testThread.text, testThread.delete_password).then(thread => {
-            helper.createReply('wrong board', thread._id, testReply.text, testReply.delete_password).then(() => {})
+            helper.createReply('wrongBoard', thread._id, testReply.text, testReply.delete_password).then(() => {})
             .catch((err) => {
                 assert.equal(err, 'Board does not exist.');
             }).then(done, done);
@@ -64,9 +64,9 @@ suite('Unit Tests', function() {
    });
 
    test('createReply_ThreadNotInBoard', (done) => {
-        helper.createThread('another board', testThread.text, testThread.delete_password).then(diffThread => {
+        helper.createThread('anotherBoard', testThread.text, testThread.delete_password).then(diffThread => {
             helper.createThread(testThread.board, testThread.text, testThread.delete_password).then(thread => {
-                helper.createReply('another board', thread._id, testReply.text, testReply.delete_password).then(() => {})
+                helper.createReply('anotherBoard', thread._id, testReply.text, testReply.delete_password).then(() => {})
                 .catch((err) => {
                     assert.equal(err, 'Thread does not exist in this board.');
                 }).then(done, done);
@@ -104,9 +104,9 @@ suite('Unit Tests', function() {
     });
 
     test('validateBoardAndThread_ThreadNotInBoard', (done) => {
-        helper.createThread('another board', testThread.text, testThread.delete_password).then(diffThread => {
+        helper.createThread('anotherBoard', testThread.text, testThread.delete_password).then(diffThread => {
             helper.createThread(testThread.board, testThread.text, testThread.delete_password).then(thread => {
-                helper.validateBoardAndThread('another board', thread._id).then(() => {})
+                helper.validateBoardAndThread('anotherBoard', thread._id).then(() => {})
                 .catch((err) => {
                     assert.equal(err, 'Thread does not exist in this board.');
                 }).then(done, done);
@@ -139,7 +139,7 @@ suite('Unit Tests', function() {
     });
 
     test('validateThreadAndReply_ReplyNotInThread', (done) => {
-        helper.createThread('another board', testThread.text, testThread.delete_password).then(diffThread => {
+        helper.createThread('anotherBoard', testThread.text, testThread.delete_password).then(diffThread => {
             helper.createThread(testThread.board, testThread.text, testThread.delete_password).then(thread => {
                 helper.createReply(testThread.board, thread._id, testReply.text, testReply.delete_password).then((reply) => {
                     helper.validateThreadAndReply(diffThread._id, reply._id).then(() => {})

@@ -148,7 +148,7 @@ suite('Functional Tests', function() {
       test('Report thread in different board unsuccessful', (done) => {
         browser.visit("http://localhost:8888/api").then(() => {
           helper.createThread(testReport.board, testReport.text, testReport.delete_password).then((result) => {
-            browser.fill('#board2', 'wrong board');
+            browser.fill('#board2', 'wrongBoard');
             browser.fill('#reportThread input[name=thread_id]', result._id);
             browser.pressButton('Report thread', () => {
               test_helper.findThread(result._id).then((data) => {
@@ -279,14 +279,14 @@ suite('Functional Tests', function() {
   suite('UI TESTING FOR /', () => {
     test('New thread created', (done) => {
       browser.visit("http://localhost:8888/").then(() => {
-        browser.fill('#new-thread input[name=board]', 'new board');
+        browser.fill('#new-thread input[name=board]', 'newBoard');
         browser.fill('#new-thread input[name=text]', testThread.text);
         browser.fill('#new-thread input[name=delete_password]', testThread.delete_password);
         browser.pressButton('#new-thread input[type=submit]', () => {
           browser.assert.success();
           browser.assert.redirected();
-          browser.assert.text('#boardTitle', 'Welcome to /b/new%20board');
-          browser.assert.url({pathname: '/b/new%20board'});
+          browser.assert.text('#boardTitle', 'Welcome to /b/newBoard');
+          browser.assert.url({pathname: '/b/newBoard'});
           browser.assert.element('#submitNewThread');
           browser.assert.element('.thread');
           browser.assert.text('.thread .main h3', 'text test');
