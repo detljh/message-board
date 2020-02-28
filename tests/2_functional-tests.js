@@ -38,11 +38,11 @@ suite('Functional Tests', function() {
           browser.pressButton('#newThread input[type=submit]', () => {
             browser.assert.success();
             browser.assert.redirected();
-            browser.assert.text('#boardTitle', 'Welcome to /b/test');
+            browser.assert.text('#page-title #top', 'Welcome to /b/test');
             browser.assert.url({pathname: '/b/test'});
-            browser.assert.element('#submitNewThread');
+            browser.assert.element('#new-thread');
             browser.assert.element('.thread');
-            browser.assert.text('.thread .main h3', 'text test');
+            browser.assert.text('.thread .body-text', 'text test');
             done();
           });
         });
@@ -176,13 +176,12 @@ suite('Functional Tests', function() {
           browser.pressButton('#newReply input[type=submit]', () => {
             browser.assert.success();
             browser.assert.redirected();
-            browser.assert.text('#threadTitle', `/b/test/${testThread.id}`);
+            browser.assert.text('#page-title #top', `/b/test/${testThread.id}`);
             browser.assert.url({pathname: `/b/test/${testThread.id}`});
             browser.assert.element('.thread');
-            browser.assert.text('.thread .main h3', 'text test');
             browser.assert.element('.replies');
             browser.assert.element('.reply')
-            browser.assert.text('.reply .replyText', testReply.text);
+            browser.assert.text('.reply .body-text', testReply.text);
             done();
           });
         });
@@ -280,16 +279,16 @@ suite('Functional Tests', function() {
     test('New thread created', (done) => {
       browser.visit("http://localhost:8888/").then(() => {
         browser.fill('#new-thread input[name=board]', 'newBoard');
-        browser.fill('#new-thread input[name=text]', testThread.text);
+        browser.fill('#new-thread textarea[name=text]', testThread.text);
         browser.fill('#new-thread input[name=delete_password]', testThread.delete_password);
-        browser.pressButton('#new-thread input[type=submit]', () => {
+        browser.pressButton('#new-thread button[type=submit]', () => {
           browser.assert.success();
           browser.assert.redirected();
-          browser.assert.text('#boardTitle', 'Welcome to /b/newBoard');
+          browser.assert.text('#page-title #top', 'Welcome to /b/newBoard');
           browser.assert.url({pathname: '/b/newBoard'});
-          browser.assert.element('#submitNewThread');
+          browser.assert.element('#new-thread');
           browser.assert.element('.thread');
-          browser.assert.text('.thread .main h3', 'text test');
+          browser.assert.text('.thread .body-text', 'text test');
           done();
         });
       });
@@ -299,11 +298,11 @@ suite('Functional Tests', function() {
       browser.visit("http://localhost:8888/").then(() => {
         browser.assert.elements('.board-name', 2);
         browser.fill('#search-board input[name=board]', 'a');
-        browser.pressButton('#search-board input[type=submit]', () => {
+        browser.pressButton('#search-board button[type=submit]', () => {
           browser.assert.success();
           browser.assert.element('.board-name');
           browser.fill('#search-board input[name=board]', '');
-          browser.pressButton('#search-board input[type=submit]', () => {
+          browser.pressButton('#search-board button[type=submit]', () => {
             browser.assert.elements('.board-name', 2);
             done();
           });
@@ -313,7 +312,65 @@ suite('Functional Tests', function() {
   });
 
   suite('UI TESTING FOR /b/:board', () => {
+    test('New thread created', (done) => {
+      helper.createThread('anotherNewBoard', testThread.text, testThread.delete_password).then((thread) => {
+        browser.visit(`http://localhost:8888/b/anotherNewBoard`).then(() => {
+          browser.fill('#new-thread textarea[name=text]', testThread.text);
+          browser.fill('#new-thread input[name=delete_password]', testThread.delete_password);
+          browser.pressButton('#new-thread button[type=submit]', () => {
+            browser.assert.success();
+            browser.assert.redirected();
+            browser.assert.text('#page-title #top', `Welcome to /b/anotherNewBoard`);
+            browser.assert.url({pathname: `/b/anotherNewBoard`});
+            browser.assert.element('#new-thread');
+            browser.assert.elements('.thread', 2);
+            done();
+          });
+        });
+      });
+    });
 
+    test('Report thread', done => {
+      helper.createThread('reportBoard', 'any', 'any').then((thread) => {
+        browser.visit(`http://localhost:8888/b/reportBoard`).then(() => {
+          browser.assert.success();
+          browser.assert.element('.thread');
+          browser.pressButton('.report-thread button[type=submit]', () => {
+            browser.assert.success();
+            browser.assert.text('#page-title #top', `Welcome to /b/reportBoard`);
+            browser.assert.url({pathname: '/b/reportBoard'});
+            test_helper.findThread(thread._id).then((data) => {
+              assert.isTrue(data[0]);
+              assert.isNotNull(data[1]);
+              assert.isTrue(data[1].reported);
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    test('Report reply', done => {
+      helper.createThread('reportBoard', 'any', 'any').then((thread) => {
+        helper.createReply('reportBoard', thread._id, 'any reply', 'password').then((reply) => {
+          browser.visit(`http://localhost:8888/b/reportBoard`).then(() => {
+            browser.assert.success();
+            browser.assert.elements('.thread', 2);
+            browser.pressButton('.report-reply:first-of-type button[type=submit]', () => {
+              browser.assert.success();
+              browser.assert.text('#page-title #top', `Welcome to /b/reportBoard`);
+              browser.assert.url({pathname: '/b/reportBoard'});
+              test_helper.findReply(reply._id).then((data) => {
+                assert.isTrue(data[0]);
+                assert.isNotNull(data[1]);
+                assert.isTrue(data[1].reported);
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
   });
 
   suite('UI TESTING FOR /b/:board/:threadid', () => {

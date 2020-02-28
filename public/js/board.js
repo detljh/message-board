@@ -7,27 +7,31 @@ document.addEventListener('DOMContentLoaded', () => {
         http.setRequestHeader('Content-Type', 'application/json');
 
         http.onload = () => {
-            const threads = JSON.parse(http.responseText);
-            threads.forEach(thread => {
-                addThread(board, thread);
-            });
+            if (http.status == 200) {
+                const threads = JSON.parse(http.responseText);
+                threads.forEach(thread => {
+                    addThread(board, thread);
+                });
 
-            const reportThreads = document.getElementsByClassName('report-thread');
-            for (let i = 0; i < reportThreads.length; i++) {
-                reportThreads[i].addEventListener("submit", reportAction);
+                const reportThreads = document.getElementsByClassName('report-thread');
+                for (let i = 0; i < reportThreads.length; i++) {
+                    reportThreads[i].addEventListener("submit", reportAction);
+                }
+                
+                const reportReplies = document.getElementsByClassName('report-reply');
+                for (let i = 0; i < reportReplies.length; i++) {
+                    reportReplies[i].addEventListener("submit", reportAction);
+                }  
+            } else {
+                window.location.href = '/';
             }
-            
-            const reportReplies = document.getElementsByClassName('report-reply');
-            for (let i = 0; i < reportReplies.length; i++) {
-                reportReplies[i].addEventListener("submit", reportAction);
-            }  
         };
 
         http.send();
     })();
 
     let html = `Welcome to /b/${board}`;
-    addElement('board-title', 'h2', 'top', 'container-title', html);
+    addElement('page-title', 'h2', 'top', 'container-title', html);
     window.document.title = `/b/${board}`;
 
     const newThreadForm = document.getElementById('new-thread');

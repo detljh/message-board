@@ -9,14 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
         http.setRequestHeader('Content-Type', 'application/json');
 
         http.onload = () => {
-            const thread = JSON.parse(http.responseText);
-            addThread(board, thread);
+            if (http.status == 200) {
+                const thread = JSON.parse(http.responseText);
+                addThread(board, thread);
+            } else {
+                window.location.href = "/";
+            }
         };
 
         http.send();
     })();
 
-    let html = `Welcome to /b/${board}/${thread_id}`;
-    addElement('board-title', 'h2', 'top', 'container-title', html);
+    let html = `/b/${board}/${thread_id}`;
+    addElement('page-title', 'h2', 'top', 'container-title', html);
     window.document.title = `/b/${board}`;
 });

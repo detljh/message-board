@@ -29,6 +29,7 @@ module.exports = function (app, db) {
     .get((req, res) => {
       db.Board.findOne({name: req.params.board}, (err, board) => {
         if (err || !board) return res.status(400).send(helper.BOARD_EXIST_ERR);
+        
 
         if (board) {
           let id = board._id;

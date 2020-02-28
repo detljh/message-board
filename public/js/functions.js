@@ -41,10 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
             url = `/api/replies/${board}`;
             data.thread_id = event.target.elements['thread_id'].value;
         }
-        
+
         const http = new XMLHttpRequest();
         http.open("PUT", url, true);
-        http.setRequestHeader('Content-Type', 'application/json');
+        http.setRequestHeader('Content-Type', 'application/json', true);
 
         http.onload = () => {
             alert(http.responseText);
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="hidden" name="thread_id" value=${thread._id}>
                     <input type="text" name="delete_password"></input>
                     <button type="submit"><i class="fas fa-trash-alt"></i></button></form></div>
-                    <p>${thread.text}</p>
+                    <p class="body-text">${thread.text}</p>
                     <p class="reply-count">${replyText} (${hiddenCount} hidden) - <a href="/b/${board}/${thread._id}">See the full thread</a></p>
                     <div class="replies">`
 
@@ -82,10 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="hidden" name="reply_id" value=${reply._id}>
                     <input type="text" name="delete_password"></input>
                     <button type="submit"><i class="fas fa-trash-alt"></i></button></form></div>
-                    <p>${reply.text}</p></div>`
+                    <p class="body-text">${reply.text}</p></div>`
         });
         
-        html += `<div class="newReply">
+        html += `<div class="new-reply-container">
                 <form action="/api/replies/${board}" method="post" id="new-reply">
                 <input type="hidden" name="thread_id" value=${thread._id}>
                 <textarea name="text" placeholder="reply..."></textarea>
