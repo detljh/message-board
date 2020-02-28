@@ -1,6 +1,7 @@
 :root {
     --bg-color: hsl(0, 0%, 95%);
     --main-color: hsl(219, 70%, 50%); 
+    --secondary-color: hsl(219, 30%, 50%);
     --border-color: hsl(0, 0%, 50%);
     --highlight-color: hsl(0, 0%, 80%);
     --opacity-transition-in: opacity 0.5s ease-in;

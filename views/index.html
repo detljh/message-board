@@ -16,7 +16,7 @@
       <h1 id="title">
         <a href="/">Message Board</a>
       </h1>
-      <span id="info" class="far fa-question-circle"></span>
+      <i id="info" class="far fa-question-circle"></i>
     </header id="top-bar">
     
     <div id="info-block" class ="block hidden">
@@ -34,11 +34,12 @@
         </h2>
         <form id="search-board">
           <label>
-            Search board:
+            Search board
           </label>
           <input type="text" name="board">
-          <input type="submit" value="Search">
+          <button type="submit"><i class="fas fa-search"></i></button>
         </form>
+        <hr>
         <div id="boards"></div>
       </div>
   
@@ -52,21 +53,24 @@
           </h2>
           <form id="new-thread" action="/api/threads/" method="post">
             <label>
-              Board name:
+              Board name
             </label>
+            <br>
             <input type="text" name="board" required>
             <br>
             <label>
-              Thread text:
+              Thread text
             </label>
+            <br>
             <input type="text" name="text" required>
             <br>
             <label>
-              Delete password:
+              Delete password
             </label>
+            <br>
             <input type="text" name="delete_password">
             <br> 
-            <input type="submit" value="Create">
+            <button type="submit"><i class="fas fa-plus"></i></button>
           </form>
         </div>
       </div>
