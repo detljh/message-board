@@ -11,6 +11,16 @@ document.addEventListener('DOMContentLoaded', () => {
             threads.forEach(thread => {
                 addThread(board, thread);
             });
+
+            const reportThreads = document.getElementsByClassName('report-thread');
+            for (let i = 0; i < reportThreads.length; i++) {
+                reportThreads[i].addEventListener("submit", reportAction);
+            }
+            
+            const reportReplies = document.getElementsByClassName('report-reply');
+            for (let i = 0; i < reportReplies.length; i++) {
+                reportReplies[i].addEventListener("submit", reportAction);
+            }  
         };
 
         http.send();

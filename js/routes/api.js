@@ -128,7 +128,7 @@ module.exports = function (app, db) {
     .put((req, res) => {
       const board = req.params.board;
       const thread_id = req.body.thread_id;
-      const reply_id = req.body.reply_id;
+      const reply_id = req.body.reply_id || req.body.report_id;
 
       helper.validateBoardAndThread(board, thread_id).then(thread => {
         helper.validateThreadAndReply(thread_id, reply_id).then(reply => {

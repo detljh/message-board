@@ -31,16 +31,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    reportAction = (event) => {
+        event.preventDefault();
+        const board = window.location.pathname.split('/')[2];
+
+        let url = `/api/threads/${board}`
+        let data = {report_id: event.target.elements['report_id'].value};
+        if (event.target.className.includes('reply')) {
+            url = `/api/replies/${board}`;
+            data.thread_id = event.target.elements['thread_id'].value;
+        }
+        
+        const http = new XMLHttpRequest();
+        http.open("PUT", url, true);
+        http.setRequestHeader('Content-Type', 'application/json');
+
+        http.onload = () => {
+            alert(http.responseText);
+        };
+
+        http.send(JSON.stringify(data));
+    }
+
     addThread = (board, thread) => {
         let replyText = thread.replycount == 1 ? `${thread.replycount} reply total` : `${thread.replycount} replies total`;
         let hiddenCount = thread.replycount - 3;
         hiddenCount = hiddenCount < 1 ? 0 : hiddenCount;
         let html = `<div class="thread-header">
                     <p class="id">id: ${thread._id} (${thread.created_on})</p>
-                    <form id="report-thread">
+                    <form class="report-thread">
                     <input type="hidden" name="report_id" value=${thread._id}>
                     <button type="submit"><i class="fas fa-flag"></i></button></form>
-                    <form id="delete-thread">
+                    <form class="delete-thread">
                     <input type="hidden" name="thread_id" value=${thread._id}>
                     <input type="text" name="delete_password"></input>
                     <button type="submit"><i class="fas fa-trash-alt"></i></button></form></div>
@@ -50,7 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         thread.replies.forEach(reply => {
             html += `<div class="reply">
+                    <div class="reply-header">
                     <p class="id">id: ${reply._id} (${reply.created_on})</p>
+                    <form class="report-reply">
+                    <input type="hidden" name="thread_id" value=${thread._id}>
+                    <input type="hidden" name="report_id" value=${reply._id}>
+                    <button type="submit"><i class="fas fa-flag"></i></button></form>
+                    <form class="delete-reply">
+                    <input type="hidden" name="reply_id" value=${reply._id}>
+                    <input type="text" name="delete_password"></input>
+                    <button type="submit"><i class="fas fa-trash-alt"></i></button></form></div>
                     <p>${reply.text}</p></div>`
         });
         
