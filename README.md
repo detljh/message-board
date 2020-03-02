@@ -1,11 +1,13 @@
-**FreeCodeCamp**- Information Security and Quality Assurance
+**FreeCodeCamp**- Information Security and Quality Assurance (Project Anonymous Message Board)
 ------
 
-Project Anon Message Board
+An [anonymous message board](https://pacific-river-78265.herokuapp.com/) which allows for the creation of threads in boards and the deletion of them using a password you set. You can also reply to threads and delete your reply in a similar way.
 
-1) SET NODE_ENV to `test` without quotes when ready to write tests and DB to your databases connection string (in .env)
-2) Recomended to create controllers/handlers and handle routing in routes/api.js
-3) You will add any security features to `server.js`
-4) You will create all of the functional/unit tests in `tests/2_functional-tests.js` and `tests/1_unit-tests.js` but only functional will be tested
+An API page is included where there are forms demonstrating the use of the API urls.
+
+-----
+
+Created using HTML, CSS and Javascript with an Express backend and MongoDB as the database. Tested using the Mocha and Zombie frameworks, with the Chai library.
+
 
 
