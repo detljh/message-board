@@ -29,15 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         http.onload = () => {
             const randomBoard = JSON.parse(http.responseText);
-            let replyText = randomBoard.replycount == 1 ? `${randomBoard.replycount} reply total` : `${randomBoard.replycount} replies total`;
             
             let html = `Visit <a href="/b/${randomBoard.board}">/b/${randomBoard.board}</a>`
             addElement('random-board', 'h2', '', 'container-title', html);
             
-            html = `<p class="id">id: ${randomBoard._id} (${randomBoard.created_on})</p>
+            html = `<div class="thread">
+                    <div class="thread-header">
+                    <p class="id"><b class="id-label">id:</b> ${randomBoard._id} (${randomBoard.created_on})</p></div>
+                    <div class="thread-body">
                     <p>${randomBoard.text}</p>
-                    <p class="reply-count">${replyText} - <a href="/b/${randomBoard.board}/${randomBoard._id}">See the full thread</a></p>`
-            addElement('random-board', 'div', 'random-thread', 'thread', html);
+                    <p class="reply-count">${randomBoard.replycount} <a href="/b/${randomBoard.board}/${randomBoard._id}"><i class="fas fa-comments"></i></a></p></div></div>`
+            addElement('random-board', 'div', 'random-thread', 'container-body', html);
         }
 
         http.send();

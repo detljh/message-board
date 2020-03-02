@@ -19,7 +19,7 @@
         <a href="/">Message Board</a>
       </h1>
       <i id="info" class="far fa-question-circle"></i>
-    </header id="top-bar">
+    </header>
 
     <div id="info-block" class ="block hidden">
       <p>
@@ -30,25 +30,28 @@
     </div>
 
     <main id="main">
-      <div id="page-title"></div>
+      <div id="page-title">
+      </div>
 
-      <div class="container">
+      <div class="container" id="new-thread-container">
         <h3 class="container-title">Submit a new thread</h3>
-        <form id="new-thread" action="/api/threads/" method="post">
-          <label>
-            Thread text
-          </label>
-          <br>
-          <textarea name="text" resizable="false" required></textarea>
-          <br>
-          <label>
-            Delete password
-          </label>
-          <br>
-          <input type="text" name="delete_password">
-          <br> 
-          <button type="submit"><i class="fas fa-plus"></i></button>
-        </form>
+        <div class="container-body">
+          <form id="new-thread" action="/api/threads/" method="post">
+            <label>
+              Thread text
+            </label>
+            <br>
+            <textarea name="text" resizable="false" required></textarea>
+            <br>
+            <label>
+              Delete password
+            </label>
+            <br>
+            <input type="text" name="delete_password">
+            <br> 
+            <button type="submit"><i class="fas fa-plus"></i></button>
+          </form>
+        </div>
       </div>
       
       <div id="scroll-top">

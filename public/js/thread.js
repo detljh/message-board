@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (http.status == 200) {
                 const thread = JSON.parse(http.responseText);
                 addThread(board, thread);
+                attachDeleteReportEventListeners();
             } else {
                 window.location.href = "/";
             }
@@ -20,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         http.send();
     })();
 
-    let html = `/b/${board}/${thread_id}`;
+    let html = `/b/${board}/${thread_id}<hr>`;
     addElement('page-title', 'h2', 'top', 'container-title', html);
     window.document.title = `/b/${board}`;
 });

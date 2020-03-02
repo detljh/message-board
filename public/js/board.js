@@ -13,15 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     addThread(board, thread);
                 });
 
-                const reportThreads = document.getElementsByClassName('report-thread');
-                for (let i = 0; i < reportThreads.length; i++) {
-                    reportThreads[i].addEventListener("submit", reportAction);
-                }
-                
-                const reportReplies = document.getElementsByClassName('report-reply');
-                for (let i = 0; i < reportReplies.length; i++) {
-                    reportReplies[i].addEventListener("submit", reportAction);
-                }  
+                attachDeleteReportEventListeners();
             } else {
                 window.location.href = '/';
             }
@@ -30,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         http.send();
     })();
 
-    let html = `Welcome to /b/${board}`;
+    let html = `Welcome to /b/${board}<hr>`;
     addElement('page-title', 'h2', 'top', 'container-title', html);
     window.document.title = `/b/${board}`;
 

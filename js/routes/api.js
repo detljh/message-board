@@ -37,22 +37,21 @@ module.exports = function (app, db) {
           db.Thread.find({board_id: id}).select('_id text created_on bumped_on').sort({bumped_on: -1}).limit(10).lean().exec((err, threads) => {
             if (err) return res.status(500).send(helper.DB_ERR);
 
-            let addReplies = new Promise((res, rej) => {
-              threads.forEach((thread, index, array) => {
+            let addReplies = []
+            
+            threads.forEach(thread => {
+              addReplies.push(new Promise((res, rej) => {
                 db.Reply.find({thread_id: thread._id}).select('_id text created_on').sort({created_on: -1}).lean().exec((err, replies) => {
                   if (err) return rej(helper.DB_ERR);
-                  if (index == array.length - 1) res();
-
                   thread['replycount'] = replies.length;
                   thread['replies'] = replies.slice(0, 3);
+                  res();
                 });
-              });
-            });
+              }))
+            })
             
-            addReplies.then(() => {
-              res.json(threads);
-            }).catch(err => res.status(500).send(err));
-          });
+            Promise.all(addReplies).then(() => res.json(threads));
+          })
         }
       });
     })

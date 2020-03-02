@@ -330,6 +330,21 @@ suite('Functional Tests', function() {
       });
     });
 
+    test('New reply created', (done) => {
+      helper.createThread('anotherNewBoard', testThread.text, testThread.delete_password).then((thread) => {
+        browser.visit(`http://localhost:8888/b/anotherNewBoard`).then(() => {
+          browser.fill('#new-reply textarea[name=text]', testThread.text);
+          browser.pressButton('#new-reply button[type=submit]', () => {
+            browser.assert.success();
+            browser.assert.redirected();
+            browser.assert.text('#page-title #top', `/b/anotherNewBoard/${thread._id}`);
+            browser.assert.element('.reply');
+            done();
+          });
+        });
+      });
+    });
+
     test('Report thread', done => {
       helper.createThread('reportBoard', 'any', 'any').then((thread) => {
         browser.visit(`http://localhost:8888/b/reportBoard`).then(() => {
@@ -356,7 +371,7 @@ suite('Functional Tests', function() {
           browser.visit(`http://localhost:8888/b/reportBoard`).then(() => {
             browser.assert.success();
             browser.assert.elements('.thread', 2);
-            browser.pressButton('.report-reply:first-of-type button[type=submit]', () => {
+            browser.pressButton('.report-reply button[type=submit]', () => {
               browser.assert.success();
               browser.assert.text('#page-title #top', `Welcome to /b/reportBoard`);
               browser.assert.url({pathname: '/b/reportBoard'});
@@ -374,6 +389,59 @@ suite('Functional Tests', function() {
   });
 
   suite('UI TESTING FOR /b/:board/:threadid', () => {
+    test('New reply created', (done) => {
+      helper.createThread('anotherNewBoard', testThread.text, testThread.delete_password).then((thread) => {
+        browser.visit(`http://localhost:8888/b/anotherNewBoard/${thread._id}`).then(() => {
+          browser.fill('#new-reply textarea[name=text]', testThread.text);
+          browser.pressButton('#new-reply button[type=submit]', () => {
+            browser.assert.success();
+            browser.assert.redirected();
+            browser.assert.text('#page-title #top', `/b/anotherNewBoard/${thread._id}`);
+            browser.assert.element('.reply');
+            done();
+          });
+        });
+      });
+    });
 
+    test('Report thread', done => {
+      helper.createThread('reportBoardAgain', 'any', 'any').then((thread) => {
+        browser.visit(`http://localhost:8888/b/reportBoardAgain/${thread._id}`).then(() => {
+          browser.assert.success();
+          browser.assert.element('.thread');
+          browser.pressButton('.report-thread button[type=submit]', () => {
+            browser.assert.success();
+            browser.assert.text('#page-title #top', `/b/reportBoardAgain/${thread._id}`);
+            test_helper.findThread(thread._id).then((data) => {
+              assert.isTrue(data[0]);
+              assert.isNotNull(data[1]);
+              assert.isTrue(data[1].reported);
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    test('Report reply', done => {
+      helper.createThread('reportBoardAgain', 'any', 'any').then((thread) => {
+        helper.createReply('reportBoardAgain', thread._id, 'any reply', 'password').then((reply) => {
+          browser.visit(`http://localhost:8888/b/reportBoardAgain/${thread._id}`).then(() => {
+            browser.assert.success();
+            browser.assert.element('.thread');
+            browser.pressButton('.report-reply button[type=submit]', () => {
+              browser.assert.success();
+              browser.assert.text('#page-title #top', `/b/reportBoardAgain/${thread._id}`);
+              test_helper.findReply(reply._id).then((data) => {
+                assert.isTrue(data[0]);
+                assert.isNotNull(data[1]);
+                assert.isTrue(data[1].reported);
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
   });
 });

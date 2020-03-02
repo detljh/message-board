@@ -53,43 +53,89 @@ document.addEventListener('DOMContentLoaded', () => {
         http.send(JSON.stringify(data));
     }
 
+    deleteAction = (event) => {
+        event.preventDefault();
+        const board = window.location.pathname.split('/')[2];
+
+        let url = `/api/threads/${board}`
+        let data = {thread_id: event.target.elements['thread_id'].value, delete_password: event.target.elements['delete_password'].value};
+        if (event.target.className.includes('reply')) {
+            url = `/api/replies/${board}`;
+            data.reply_id = event.target.elements['reply_id'].value;
+        }
+
+        const http = new XMLHttpRequest();
+        http.open("DELETE", url, true);
+        http.setRequestHeader('Content-Type', 'application/json', true);
+
+        http.onload = () => {
+            alert(http.responseText);
+        };
+
+        http.send(JSON.stringify(data));
+    }
+
+    attachDeleteReportEventListeners = () => {
+        const reportThreads = document.getElementsByClassName('report-thread');
+        for (let i = 0; i < reportThreads.length; i++) {
+            reportThreads[i].addEventListener("submit", reportAction);
+        }
+        
+        const reportReplies = document.getElementsByClassName('report-reply');
+        for (let i = 0; i < reportReplies.length; i++) {
+            reportReplies[i].addEventListener("submit", reportAction);
+        }  
+
+        const deleteThreads = document.getElementsByClassName('delete-thread');
+        for (let i = 0; i < deleteThreads.length; i++) {
+            deleteThreads[i].addEventListener("submit", deleteAction);
+        }
+        
+        const deleteReplies = document.getElementsByClassName('delete-reply');
+        for (let i = 0; i < deleteReplies.length; i++) {
+            deleteReplies[i].addEventListener("submit", deleteAction);
+        }  
+    }
+
     addThread = (board, thread) => {
-        let replyText = thread.replycount == 1 ? `${thread.replycount} reply total` : `${thread.replycount} replies total`;
         let hiddenCount = thread.replycount - 3;
         hiddenCount = hiddenCount < 1 ? 0 : hiddenCount;
         let html = `<div class="thread-header">
-                    <p class="id">id: ${thread._id} (${thread.created_on})</p>
-                    <form class="report-thread">
-                    <input type="hidden" name="report_id" value=${thread._id}>
-                    <button type="submit"><i class="fas fa-flag"></i></button></form>
+                    <p class="id"><b class="id-label">id:</b> ${thread._id} (${thread.created_on})</p>
                     <form class="delete-thread">
                     <input type="hidden" name="thread_id" value=${thread._id}>
                     <input type="text" name="delete_password"></input>
-                    <button type="submit"><i class="fas fa-trash-alt"></i></button></form></div>
+                    <button type="submit"><i class="fas fa-trash-alt"></i></button></form>
+                    <form class="report-thread">
+                    <input type="hidden" name="report_id" value=${thread._id}>
+                    <button type="submit"><i class="fas fa-flag"></i></button></form></div>
+                    <div class="thread-body">
                     <p class="body-text">${thread.text}</p>
-                    <p class="reply-count">${replyText} (${hiddenCount} hidden) - <a href="/b/${board}/${thread._id}">See the full thread</a></p>
+                    <p class="reply-count">${thread.replycount} <a href="/b/${board}/${thread._id}"><i class="fas fa-comments"></i></a> (${hiddenCount} hidden)</p> 
                     <div class="replies">`
 
         thread.replies.forEach(reply => {
-            html += `<div class="reply">
+            html += `<div class="reply" id=${reply._id}>
                     <div class="reply-header">
-                    <p class="id">id: ${reply._id} (${reply.created_on})</p>
+                    <p class="id"><b class="id-label">id:</b> ${reply._id} (${reply.created_on})</p>
+                    <form class="delete-reply">
+                    <input type="hidden" name="thread_id" value=${thread._id}>
+                    <input type="hidden" name="reply_id" value=${reply._id}>
+                    <input type="text" name="delete_password"></input>
+                    <button type="submit"><i class="fas fa-trash-alt"></i></button></form>
                     <form class="report-reply">
                     <input type="hidden" name="thread_id" value=${thread._id}>
                     <input type="hidden" name="report_id" value=${reply._id}>
-                    <button type="submit"><i class="fas fa-flag"></i></button></form>
-                    <form class="delete-reply">
-                    <input type="hidden" name="reply_id" value=${reply._id}>
-                    <input type="text" name="delete_password"></input>
-                    <button type="submit"><i class="fas fa-trash-alt"></i></button></form></div>
-                    <p class="body-text">${reply.text}</p></div>`
+                    <button type="submit"><i class="fas fa-flag"></i></button></form></div>
+                    <div class="reply-body">
+                    <p class="body-text">${reply.text}</p></div></div>`
         });
         
         html += `<div class="new-reply-container">
                 <form action="/api/replies/${board}" method="post" id="new-reply">
                 <input type="hidden" name="thread_id" value=${thread._id}>
                 <textarea name="text" placeholder="reply..."></textarea>
-                <button type="submit"><i class="fas fa-plus"></i></button></form></div>`;
+                <button type="submit"><i class="fas fa-comment"></i></button></form></div></div>`;
         addElement('main', 'div', thread._id, 'thread', html);
     }
     
